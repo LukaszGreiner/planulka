@@ -4,17 +4,10 @@ import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { LoginPageComponent } from './login-page/login-page.component';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    AsyncPipe,
-    MatSlideToggleModule,
-    LoginPageComponent,
-  ],
+  imports: [RouterOutlet, RouterLink, AsyncPipe, MatSlideToggleModule],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
