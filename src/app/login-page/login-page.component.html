@@ -1,12 +1,12 @@
 <form
-  class="bg-white/90 rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-6 border border-gray-200"
+  class="bg-white/90 rounded-xl shadow-lg p-6 w-full max-w-xl flex flex-col gap-6 border border-gray-200 min-w-sm md:min-w-xl"
   autocomplete="on"
   (ngSubmit)="loginWithEmail()"
 >
   <h2 class="text-3xl font-bold text-center text-hunter-green mb-2">
     Zaloguj się
   </h2>
-  <mat-form-field appearance="outline" class="w-full">
+  <mat-form-field appearance="fill" class="w-full">
     <mat-label>Email</mat-label>
     <input
       matInput
@@ -18,7 +18,7 @@
       name="email"
     />
   </mat-form-field>
-  <mat-form-field appearance="outline" class="w-full">
+  <mat-form-field appearance="fill" class="w-full">
     <mat-label>Hasło</mat-label>
     <input
       matInput

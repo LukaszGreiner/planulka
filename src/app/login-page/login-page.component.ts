@@ -41,7 +41,7 @@ export class LoginPageComponent {
       await signInWithEmailAndPassword(this.auth, this.email, this.password);
       this.router.navigate(['/app']);
     } catch (err: any) {
-      this.error = err.message || 'Błąd logowania';
+      this.error = 'Wprowadź prawidłowe dane logowania';
     }
   }
 
@@ -51,7 +51,7 @@ export class LoginPageComponent {
       await signInWithPopup(this.auth, new GoogleAuthProvider());
       this.router.navigate(['/app']);
     } catch (err: any) {
-      this.error = err.message || 'Błąd logowania przez Google';
+      this.error = 'Wprowadź prawidłowe dane logowania';
     }
   }
 }
