@@ -1,21 +1,8 @@
-<main
-  class="main flex flex-col items-center justify-center min-h-screen bg-gray-100"
->
-  <strong>AngularRouter check</strong>
-  <nav class="flex gap-10 m-6 p-6">
-    <a class="bg-red-400 p-2" routerLink="/app">app</a>
-    <a class="button" routerLink="/auth/login">Login</a>
-    <a class="button" routerLink="auth/register">Signup</a>
-  </nav>
-  <router-outlet></router-outlet>
-  <div class="content">
-    <mat-slide-toggle><strong>AngularMaterial check</strong></mat-slide-toggle>
-    <br /><br />
-    <ul>
-      <strong>Firebase check</strong>
-      @for (item of items$ | async; track item) {
-      <li>{{ item.title }}</li>
-      }
-    </ul>
+<div class="flex flex-col min-h-screen w-full">
+  <app-header></app-header>
+  <div
+    class="min-h-[calc(100vh-4rem)] w-full flex justify-center items-center bg-red-200"
+  >
+    <router-outlet></router-outlet>
   </div>
-</main>
+</div>

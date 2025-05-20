@@ -1,1 +1,80 @@
-<p>signup-page works!</p>
+<div
+  class="flex min-h-screen items-center justify-center bg-gradient-to-br from-celadon to-fawn"
+>
+  <form
+    class="bg-white/90 rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-6 border border-gray-200"
+    autocomplete="on"
+    (ngSubmit)="signupWithEmail()"
+  >
+    <h2 class="text-3xl font-bold text-center text-hunter-green mb-2">
+      Zarejestruj się
+    </h2>
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        type="email"
+        required
+        autocomplete="email"
+        class="!bg-transparent"
+        [(ngModel)]="email"
+        name="email"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Hasło</mat-label>
+      <input
+        matInput
+        type="password"
+        required
+        minlength="6"
+        autocomplete="new-password"
+        class="!bg-transparent"
+        [(ngModel)]="password"
+        name="password"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Powtórz hasło</mat-label>
+      <input
+        matInput
+        type="password"
+        required
+        minlength="6"
+        autocomplete="new-password"
+        class="!bg-transparent"
+        [(ngModel)]="repeatPassword"
+        name="repeatPassword"
+      />
+    </mat-form-field>
+    <button
+      mat-flat-button
+      color="primary"
+      class="w-full !bg-hunter-green !text-white py-2 text-lg rounded-lg shadow transition hover:scale-105"
+      type="submit"
+    >
+      Zarejestruj się
+    </button>
+    <button
+      type="button"
+      (click)="signupWithGoogle()"
+      mat-stroked-button
+      color="primary"
+      class="w-full flex items-center justify-center gap-2 border-hunter-green text-hunter-green mt-2 py-2 rounded-lg shadow hover:bg-celadon transition"
+    >
+      <mat-icon svgIcon="google" class="mr-2"></mat-icon>
+      Zarejestruj się przez Google
+    </button>
+    <div *ngIf="error" class="text-red-600 text-center text-sm mt-2">
+      {{ error }}
+    </div>
+    <div class="text-center text-sm text-gray-500 mt-2">
+      Masz już konto?
+      <a
+        routerLink="/auth/login"
+        class="text-tangerine font-semibold hover:underline"
+        >Zaloguj się</a
+      >
+    </div>
+  </form>
+</div>
