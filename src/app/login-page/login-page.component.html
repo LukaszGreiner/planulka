@@ -1,7 +1,8 @@
 <form
-  class="bg-white/90 rounded-xl shadow-lg p-6 w-full max-w-xl flex flex-col gap-6 border border-gray-200 min-w-sm md:min-w-xl"
+  [formGroup]="form"
+  class="bg-white/80 rounded-xl shadow-lg p-6 w-full max-w-xl flex flex-col gap-6 border border-gray-200 min-w-sm md:min-w-xl"
   autocomplete="on"
-  (ngSubmit)="loginWithEmail()"
+  (ngSubmit)="onSubmit()"
 >
   <h2 class="text-3xl font-bold text-center text-hunter-green mb-2">
     Zaloguj się
@@ -13,8 +14,7 @@
       type="email"
       required
       autocomplete="email"
-      class="!bg-transparent"
-      [(ngModel)]="email"
+      formControlName="email"
       name="email"
     />
   </mat-form-field>
@@ -26,15 +26,14 @@
       required
       minlength="6"
       autocomplete="current-password"
-      class="!bg-transparent"
-      [(ngModel)]="password"
+      formControlName="password"
       name="password"
     />
   </mat-form-field>
   <button
     mat-flat-button
     color="primary"
-    class="w-full !bg-hunter-green !text-white py-2 text-lg rounded-lg shadow transition hover:scale-105"
+    class="w-full bg-hunter-green text-white py-2 text-lg rounded-lg shadow transition hover:scale-105"
     type="submit"
   >
     Zaloguj się
@@ -44,7 +43,7 @@
     (click)="loginWithGoogle()"
     mat-stroked-button
     color="primary"
-    class="w-full flex items-center justify-center gap-2 border-hunter-green text-hunter-green mt-2 py-2 rounded-lg shadow hover:bg-celadon transition"
+    class="w-full flex items-center justify-center gap-2 border-hunter-green text-hunter-green mt-2 py-2 rounded-lg shadow hover:scale-105 transition"
   >
     <mat-icon svgIcon="google" class="mr-2"></mat-icon>
     Zaloguj się przez Google

@@ -44,25 +44,7 @@ updatedAt Date Data aktualizacji
 - Autoryzacja na podstawie roli (admin, user)
 - Firebase Auth + Guardy Angulara
 
-✅ Zarządzanie zadaniami
-CRUD:
-
-- Tworzenie zadania (form)
-- Edycja zadania
-- Usuwanie zadania (admin lub właściciel)
-- Oznaczanie jako wykonane (update status, completedAt)
-
-Zasady:
-
-- Użytkownik może edytować/usuwać tylko swoje zadania
-- Admin może zarządzać wszystkimi zadaniami i użytkownikami
-- Zadania mogą mieć wielu przypisanych użytkowników
-- Brak powiadomień w MVP
-
-Filtry i sortowanie:
-
-- Filtr: status, przypisany użytkownik
-- Sortowanie: priorytet, data utworzenia
+✅ Ba
 
 🌐 Routing i strony
 Ścieżka Opis

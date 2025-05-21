@@ -1,57 +1,85 @@
 import { Component, inject } from '@angular/core';
-import {
-  Auth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from '@angular/fire/auth';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { RouterLink, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-login-page',
+  selector: 'app-user-login',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatIcon,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule,
-    RouterLink,
   ],
-  templateUrl: './login-page.component.html',
+  templateUrl: './login-page.component.html', // Updated to match the file name
 })
 export class LoginPageComponent {
-  private auth = inject(Auth);
-  private router = inject(Router);
+  error: string = '';
+  form: FormGroup;
+  private fb: FormBuilder = inject(FormBuilder);
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
 
-  email = '';
-  password = '';
-  error: string | null = null;
+  constructor() {
+    this.form = this.fb.nonNullable.group({
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+          ),
+        ],
+      ],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
 
-  async loginWithEmail() {
-    this.error = null;
-    try {
-      await signInWithEmailAndPassword(this.auth, this.email, this.password);
-      this.router.navigate(['/app']);
-    } catch (err: any) {
-      this.error = 'Wprowadź prawidłowe dane logowania';
+  onSubmit(): void {
+    if (this.form.valid) {
+      const { email, password } = this.form.getRawValue();
+      this.authService.login(email, password).subscribe({
+        next: () => {
+          this.router.navigateByUrl('/app');
+        },
+        error: (error) => {
+          this.error = 'Nieprawidłowy email lub hasło.';
+          console.error('Email/Password Sign-In error:', error);
+        },
+      });
     }
   }
 
-  async loginWithGoogle() {
-    this.error = null;
+  guestLogin(): void {
+    const values = { email: 'guest@mail.uk', password: 'fake_password' };
+    this.form.patchValue(values);
+    const subscription = this.form.valueChanges.subscribe(() => {
+      if (this.form.valid) {
+        subscription.unsubscribe();
+        this.onSubmit();
+      }
+    });
+  }
+
+  async loginWithGoogle(): Promise<void> {
     try {
-      await signInWithPopup(this.auth, new GoogleAuthProvider());
-      this.router.navigate(['/app']);
-    } catch (err: any) {
-      this.error = 'Wprowadź prawidłowe dane logowania';
+      await this.authService.googleLogin();
+      this.router.navigateByUrl('/app');
+    } catch (error) {
+      this.error = 'Błąd logowania przez Google.';
+      console.error('Google Sign-In error:', error);
     }
   }
 }
