@@ -4,6 +4,7 @@ import {
   collection,
   query,
   where,
+  orderBy,
   getDocs,
   addDoc,
   doc,
@@ -55,8 +56,53 @@ export class TaskService {
   }
 
   getAllTasks(): Observable<Task[]> {
-    console.log('Fetching all tasks...'); // Debug log
     return collectionData(this.tasksCollection, { idField: 'id' }).pipe(
+      map(
+        (tasks: any[]) =>
+          tasks.map((task: any) => ({
+            ...task,
+            dueDate:
+              task.dueDate instanceof Timestamp
+                ? task.dueDate.toDate()
+                : task.dueDate,
+            createdAt:
+              task.createdAt instanceof Timestamp
+                ? task.createdAt.toDate()
+                : task.createdAt,
+            updatedAt:
+              task.updatedAt instanceof Timestamp
+                ? task.updatedAt.toDate()
+                : task.updatedAt,
+            completedAt:
+              task.completedAt instanceof Timestamp
+                ? task.completedAt.toDate()
+                : task.completedAt,
+          })) as Task[]
+      )
+    );
+  }
+
+  getFilteredAndSortedTasks(
+    userId: string | null,
+    statusFilter: 'todo' | 'in_progress' | 'done' | null,
+    sortBy: 'priority' | 'createdAt' | null,
+    isAdmin: boolean
+  ): Observable<Task[]> {
+    let q = query(this.tasksCollection);
+
+    if (!isAdmin && userId) {
+      q = query(q, where('assignedUsers', 'array-contains', userId));
+    }
+
+    if (statusFilter) {
+      q = query(q, where('status', '==', statusFilter));
+    }
+
+    if (sortBy) {
+      q = query(q, orderBy(sortBy));
+    }
+
+    return collectionData(q, { idField: 'id' }).pipe(
       map(
         (tasks: any[]) =>
           tasks.map((task: any) => ({

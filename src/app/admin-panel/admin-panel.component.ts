@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Task, TaskStatus } from '../models/task.model';
 import { TaskService } from '../services/task.service';
 import { AuthService } from '../services/auth.service';
@@ -13,8 +15,8 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
-import { Timestamp } from 'firebase/firestore';
-import { deleteDoc, doc, setDoc } from '@angular/fire/firestore';
+import { Timestamp, deleteDoc, doc, setDoc } from '@angular/fire/firestore';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 interface UserProfile {
   id: string;
@@ -35,6 +37,9 @@ interface UserProfile {
     MatIconModule,
     MatDialogModule,
     MatTableModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
   ],
   template: `
     <div
@@ -45,6 +50,25 @@ interface UserProfile {
 
       <!-- Tasks Section -->
       <h3>All Tasks</h3>
+      <div class="filters">
+        <mat-form-field appearance="fill">
+          <mat-label>Filter by Status</mat-label>
+          <mat-select [formControl]="statusFilter">
+            <mat-option value="">All</mat-option>
+            <mat-option value="todo">To Do</mat-option>
+            <mat-option value="in_progress">In Progress</mat-option>
+            <mat-option value="done">Done</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Sort by</mat-label>
+          <mat-select [formControl]="sortBy">
+            <mat-option value="">None</mat-option>
+            <mat-option value="priority">Priority</mat-option>
+            <mat-option value="createdAt">Creation Date</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
       <mat-table [dataSource]="tasks" class="mat-elevation-z8">
         <ng-container matColumnDef="title">
           <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
@@ -95,7 +119,7 @@ interface UserProfile {
 
       <!-- Users Section -->
       <h3>All Users</h3>
-      <mat-table [dataSource]="users$ | async" class="mat-elevation-z8">
+      <mat-table [dataSource]="(users$ | async) ?? []" class="mat-elevation-z8">
         <ng-container matColumnDef="email">
           <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
           <mat-cell *matCellDef="let user">{{ user.email }}</mat-cell>
@@ -145,6 +169,11 @@ interface UserProfile {
       h3 {
         margin-bottom: 1rem;
       }
+      .filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
       .mat-elevation-z8 {
         margin-bottom: 2rem;
         width: 100%;
@@ -168,28 +197,38 @@ export class AdminPanelComponent implements OnInit {
   private dialog = inject(MatDialog);
   private firestore = inject(Firestore);
   private router = inject(Router);
-  userRole: string | null = null;
+  userRole: 'admin' | 'user' | null = null;
   tasks: Task[] = [];
-  users$: Observable<UserProfile[]> = new Observable<UserProfile[]>();
+  users$!: Observable<UserProfile[]>; // Tell TypeScript that the property will be assigned a value later
   taskColumns: string[] = ['title', 'priority', 'status', 'dueDate', 'actions'];
   userColumns: string[] = ['email', 'role', 'actions'];
+  statusFilter = new FormControl('');
+  sortBy = new FormControl('');
 
   ngOnInit(): void {
     this.authService.getUserRole().subscribe((role) => {
-      this.userRole = role;
+      this.userRole = role as 'admin' | 'user';
       if (this.userRole !== 'admin') {
         this.router.navigate(['/app']);
       } else {
         this.loadTasks();
         this.loadUsers();
+        this.subscribeToFilters();
       }
     });
   }
 
   loadTasks(): void {
-    this.taskService.getAllTasks().subscribe((tasks) => {
-      this.tasks = tasks;
-    });
+    this.taskService
+      .getFilteredAndSortedTasks(
+        null, // Admins see all tasks, so no userId filter
+        this.statusFilter.value as 'todo' | 'in_progress' | 'done' | null,
+        this.sortBy.value as 'priority' | 'createdAt' | null,
+        true // isAdmin = true
+      )
+      .subscribe((tasks) => {
+        this.tasks = tasks;
+      });
   }
 
   loadUsers(): void {
@@ -210,6 +249,11 @@ export class AdminPanelComponent implements OnInit {
           })) as UserProfile[]
       )
     );
+  }
+
+  subscribeToFilters(): void {
+    this.statusFilter.valueChanges.subscribe(() => this.loadTasks());
+    this.sortBy.valueChanges.subscribe(() => this.loadTasks());
   }
 
   async editTask(task: Task): Promise<void> {
