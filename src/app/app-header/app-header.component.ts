@@ -10,32 +10,100 @@ import { filter } from 'rxjs/operators';
   imports: [CommonModule],
   selector: 'app-header',
   template: `
-    <div class="flex flex-1 items-center gap-2 px-4">
-      <img
-        src="icons/android-chrome-192x192.png"
-        alt="logo"
-        class="h-16 w-16 py-1"
-      />
-      <span class="text-4xl font-bold">Planulka</span>
-      <div class="ml-auto flex gap-2">
+    <header
+      class="app-header-container flex items-center justify-between px-4 shadow-md h-16"
+    >
+      <div class="flex items-center gap-2">
+        <img
+          src="assets/images/logo.png"
+          alt="Planulka Logo"
+          class="h-10 w-10 md:h-12 md:w-12"
+        />
+        <span
+          class="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)]"
+          >Planulka</span
+        >
+      </div>
+      <nav class="flex gap-2 md:gap-4">
         <button
           *ngIf="(user$ | async) && userRole === 'admin'"
           (click)="toggleView()"
-          class="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer"
-          [ngClass]="{ 'bg-blue-700': isAdminPanelRoute }"
+          class="app-header-button"
+          [class.active]="isAdminPanelRoute"
         >
-          {{ isAdminPanelRoute ? 'Dashboard' : 'Panel Admina' }}
+          {{ isAdminPanelRoute ? 'Dashboard' : 'Admin Panel' }}
         </button>
         <button
           *ngIf="user$ | async"
           (click)="logout()"
-          class="px-4 py-2 bg-red-600 text-white rounded cursor-pointer"
+          class="app-header-button logout-button"
         >
           Logout
         </button>
-      </div>
-    </div>
+      </nav>
+    </header>
   `,
+  styles: [
+    `
+      .app-header-container {
+        background-color: var(--surface-card);
+        border-bottom: 1px solid var(--surface-border);
+      }
+
+      .app-header-button {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem; /* rounded-md */
+        font-weight: 500; /* medium */
+        color: var(--color-text-primary);
+        background-color: var(--surface-ground);
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        border: 1px solid var(--surface-border);
+      }
+
+      .app-header-button:hover {
+        background-color: var(--surface-hover);
+        color: var(--color-accent);
+      }
+
+      .app-header-button.active {
+        background-color: var(--color-accent);
+        color: var(--color-accent-contrast);
+        border-color: var(--color-accent);
+      }
+
+      .app-header-button.logout-button {
+        background-color: var(--color-error);
+        color: var(--color-primary-contrast);
+        border-color: var(--color-error);
+      }
+
+      .app-header-button.logout-button:hover {
+        background-color: var(--surface-hover);
+        color: var(--color-error);
+        border-color: var(--color-error);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 640px) {
+        /* sm breakpoint */
+        .app-header-container {
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+        .app-header-button {
+          padding: 0.5rem 0.75rem;
+          font-size: 0.875rem; /* text-sm */
+        }
+        .flex.items-center.gap-2 > span {
+          font-size: 1.25rem; /* text-xl for Planulka text */
+        }
+        .flex.items-center.gap-2 > img {
+          height: 2rem; /* h-8 */
+          width: 2rem; /* w-8 */
+        }
+      }
+    `,
+  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class AppHeaderComponent {

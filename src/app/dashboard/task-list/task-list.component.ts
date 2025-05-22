@@ -228,12 +228,40 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         flex-direction: column;
         gap: 1rem;
         padding: 1rem;
+        background-color: var(
+          --surface-ground
+        ); /* Ensure container bg is themed */
+        color: var(--color-text-primary); /* Ensure text color is themed */
       }
 
       .filters {
         display: flex;
         gap: 1rem;
         margin-bottom: 1rem;
+        justify-content: center; /* Center the filters */
+      }
+
+      /* Styling for mat-form-field in filters */
+      .filters mat-form-field .mat-mdc-text-field-wrapper {
+        background-color: var(--surface-input) !important;
+      }
+      .filters mat-form-field .mat-mdc-floating-label {
+        color: var(--color-text-secondary) !important;
+      }
+      .filters mat-form-field.mat-focused .mat-mdc-floating-label {
+        color: var(--color-text-primary) !important;
+      }
+      .filters mat-form-field .mat-mdc-select-value-text {
+        color: var(--color-text-primary) !important;
+      }
+      .filters mat-form-field .mat-mdc-select-arrow svg {
+        fill: var(--color-text-secondary) !important;
+      }
+      .filters mat-form-field .mat-mdc-form-field-focus-overlay {
+        background-color: transparent !important; /* Remove default focus overlay if not desired */
+      }
+      .filters mat-form-field .mdc-line-ripple::after {
+        border-bottom-color: var(--color-accent) !important;
       }
 
       .columns-container {
@@ -244,7 +272,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
       }
 
       .task-column {
-        background-color: #f5f5f5;
+        background-color: var(--surface-card);
         border-radius: 8px;
         padding: 1rem;
         overflow-y: auto; /* Enable vertical scrolling */
@@ -259,7 +287,8 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         text-align: center;
         font-size: 1.25rem;
         font-weight: 500;
-        border-bottom: 2px solid #e0e0e0;
+        border-bottom: 2px solid var(--surface-border);
+        color: var(--color-text-primary);
       }
 
       .task-list {
@@ -273,15 +302,42 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         margin-bottom: 1rem;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: box-shadow 0.3s ease-in-out;
-        background-color: white;
+        background-color: var(--surface-dialog); /* Changed from white */
+        color: var(--color-text-primary);
       }
 
       .task-card:hover {
         box-shadow: none; /* Removed hover effect from task card */
       }
 
-      mat-card-actions button {
-        transition: transform 0.2s ease-in-out;
+      mat-card-actions button mat-icon {
+        transition: color 0.2s ease-in-out; /* Smooth color transition for icons */
+      }
+
+      /* Edit button icon */
+      mat-card-actions button[aria-label='Edit task'] mat-icon {
+        color: var(--color-accent) !important;
+      }
+
+      /* Delete button icon */
+      mat-card-actions button[aria-label='Delete task'] mat-icon {
+        color: var(--color-error) !important;
+      }
+
+      /* Status toggle icons based on Angular Material theme palette on the button */
+      /* For 'To Do' status (button has color='warn') */
+      mat-card-actions button.mat-warn .mat-icon {
+        color: var(--color-text-secondary) !important;
+      }
+
+      /* For 'In Progress' status (button has color='primary') */
+      mat-card-actions button.mat-primary .mat-icon {
+        color: var(--color-info) !important;
+      }
+
+      /* For 'Done' status (button has color='accent') */
+      mat-card-actions button.mat-accent .mat-icon {
+        color: var(--color-accent) !important;
       }
 
       mat-card-actions button:hover {
@@ -295,11 +351,12 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
       mat-card-title {
         font-size: 1.25rem;
         font-weight: 500;
+        color: var(--color-text-primary);
       }
 
       mat-card-subtitle {
         font-size: 0.875rem;
-        color: #666;
+        color: var(--color-text-secondary); /* Changed from #666 */
       }
 
       mat-card-content p {
@@ -309,14 +366,57 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
 
       mat-card-actions {
         padding-top: 0.5rem;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--surface-border); /* Changed from #eee */
       }
 
       .no-tasks-message {
         text-align: center;
         padding: 2rem;
         font-style: italic;
-        color: #888;
+        color: var(--color-text-secondary); /* Changed from #888 */
+      }
+
+      /* Specific styles for mat-select dropdown panel and options */
+      ::ng-deep .mat-mdc-select-panel {
+        background-color: var(--surface-dialog) !important;
+      }
+      ::ng-deep .mat-mdc-option {
+        background-color: transparent !important;
+        color: var(--color-text-primary) !important;
+      }
+      ::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+        color: var(--color-text-primary) !important;
+      }
+      ::ng-deep .mat-mdc-option.mat-mdc-option-active,
+      ::ng-deep .mat-mdc-option:focus:not(.mat-mdc-option-selected),
+      ::ng-deep .mat-mdc-option:hover:not(.mat-mdc-option-selected) {
+        background-color: var(--surface-hover) !important;
+      }
+      ::ng-deep
+        .mat-mdc-option.mat-mdc-option-active
+        .mdc-list-item__primary-text,
+      ::ng-deep
+        .mat-mdc-option:focus:not(.mat-mdc-option-selected)
+        .mdc-list-item__primary-text,
+      ::ng-deep
+        .mat-mdc-option:hover:not(.mat-mdc-option-selected)
+        .mdc-list-item__primary-text {
+        color: var(--color-text-primary) !important;
+      }
+      /* Style for the checkmark of a selected mat-option to be orange */
+      ::ng-deep
+        .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
+        .mat-pseudo-checkbox {
+        background: transparent !important; /* Ensure no background on the box itself */
+        border-color: transparent !important; /* Ensure no border on the box itself */
+      }
+      ::ng-deep
+        .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
+        .mat-pseudo-checkbox::after {
+        /* This pseudo-element is the checkmark path */
+        color: var(
+          --color-accent
+        ) !important; /* Make the checkmark icon orange */
       }
 
       @media (max-width: 1024px) {

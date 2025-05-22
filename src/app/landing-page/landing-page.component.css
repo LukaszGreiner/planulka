@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  background-color: var(--surface-ground);
+  min-height: 100vh; /* Ensure it takes full viewport height */
+}
+
+.landing-page-container {
+  background-color: var(--surface-ground);
+}
+
+.landing-card {
+  background-color: var(
+    --surface-card
+  ) !important; /* Override Material default */
+  border: 1px solid var(--surface-border);
+}
+
+.title-text {
+  color: var(--color-accent) !important;
+}
+
+.subtitle-text {
+  color: var(--color-text-secondary) !important;
+}
+
+.cta-button {
+  background-color: var(--color-accent) !important;
+  color: var(--color-accent-contrast) !important;
+  border: 1px solid var(--color-accent) !important;
+}
+
+.cta-button:hover {
+  background-color: var(--surface-hover) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}

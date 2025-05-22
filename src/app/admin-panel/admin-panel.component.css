@@ -1,0 +1,169 @@
+/* Styles for Admin Panel */
+
+.admin-panel-container {
+  background-color: var(--surface-ground);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.admin-panel-container h2,
+.admin-panel-container h3 {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Panel card matching login form styling */
+.panel-card {
+  backdrop-filter: none;
+  background-color: var(--surface-card) !important;
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 48rem;
+  animation: enterAnimation 0.3s ease-out forwards;
+  color: var(
+    --color-text-primary
+  ) !important; /* Ensure all panel text uses high-contrast primary color */
+}
+
+/* Ensure all panel-card text is high contrast */
+.panel-card, .panel-card * {
+  color: var(--color-text-primary) !important;
+}
+
+/* Accent for main heading */
+.panel-card > h2 {
+  color: var(--color-accent) !important;
+}
+
+/* Accent filter icons */
+.filters mat-icon {
+  color: var(--color-accent) !important;
+}
+
+.admin-table {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.admin-table .mat-header-cell {
+  background-color: var(--surface-card) !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-accent) !important; /* Enforce accent color for header bottom border */
+}
+
+.admin-table .mat-cell {
+  color: var(--color-text-primary) !important; /* Table content cells */
+}
+
+.admin-table .mat-row {
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.admin-table .mat-row:hover {
+  background-color: rgba(255, 165, 0, 0.05);
+}
+
+.users-heading {
+  margin-top: 2rem;
+  color: var(--color-text-primary) !important; /* Users heading */
+}
+
+/* Action icons */
+.admin-table button.mat-icon-button {
+  color: var(--color-accent);
+}
+
+.admin-table button.mat-icon-button[color="warn"] {
+  color: var(--color-error);
+}
+
+/* Themed Form Fields for filter selects */
+.themed-form-field .mat-mdc-form-field-flex {
+  background-color: var(--surface-input) !important;
+  border-radius: 0.5rem !important;
+}
+.themed-form-field .mat-mdc-floating-label,
+.themed-form-field mat-label {
+  color: var(--color-text-secondary) !important;
+}
+.themed-form-field.mat-focused .mat-mdc-floating-label,
+.themed-form-field.mat-focused mat-label {
+  color: var(--color-accent) !important;
+}
+.themed-form-field .mat-mdc-notched-outline__leading,
+.themed-form-field .mat-mdc-notched-outline__notch,
+.themed-form-field .mat-mdc-notched-outline__trailing {
+  border-color: var(--surface-border) !important;
+  border-radius: 0.5rem !important;
+}
+/* Icon color inside themed form fields */
+.themed-form-field mat-icon {
+  color: var(--color-accent) !important;
+}
+
+/* Ensure select trigger and options text has high contrast */
+.themed-input,
+.themed-form-field .mat-mdc-select-trigger {
+  color: var(--color-text-primary) !important;
+}
+
+/* Select trigger and arrow color */
+.themed-form-field .mat-mdc-select-trigger {
+  color: var(--color-text-primary) !important;
+}
+.themed-form-field .mat-mdc-select-arrow svg {
+  fill: var(--color-text-primary) !important;
+}
+
+/* Dropdown panel styles */
+.mat-mdc-select-panel {
+  background-color: var(--surface-card) !important;
+  opacity: 1 !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 0.5rem !important;
+}
+.mat-mdc-option {
+  color: var(--color-text-primary) !important;
+}
+.mat-mdc-option.mat-selected .mat-mdc-option-text {
+  color: var(--color-text-primary) !important;
+}
+
+/* Reuse the entrance animation defined earlier */
+@keyframes enterAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No access message */
+.no-access-message {
+  color: var(--color-text-primary) !important;
+}

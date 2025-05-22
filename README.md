@@ -59,7 +59,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
   - Email: `admin@example.com`
   - Password: `admin123`
 - **User Account**:
-  - Email: `user@example.com`
+  - Email: `user@gmail.com`
   - Password: `user123`
 
 ## Style Guide

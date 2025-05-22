@@ -8,22 +8,10 @@
 }
 
 .auth-card {
-  /* Glassmorphism base - set via template classes */
+  /* Removed default background to allow glassmorphism effect via template classes */
   border: 1px solid var(--surface-border);
-  border-radius: 1rem; /* rounded-2xl to match template */
-}
-
-/* Entrance animation */
-.animate-enter {
-  opacity: 0;
-  transform: scale(0.95);
-  animation: enterAnimation 0.3s ease-out forwards;
-}
-@keyframes enterAnimation {
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  border-radius: 0.75rem; /* rounded-xl */
+  /* gap: 1.5rem; /* Replaced by gap-4 in HTML for more control */
 }
 
 .title-text {
@@ -45,12 +33,9 @@
   ) !important; /* Slightly darker orange for hover */
 }
 
-/* Styles for MatFormField */
 .themed-form-field .mat-mdc-form-field-flex {
   background-color: var(--surface-input) !important;
   border-radius: 0.5rem !important; /* Added for rounding input container */
-  /* Remove default bottom border line if not using 'outline' appearance */
-  /* border-bottom: none !important; */
 }
 
 .themed-form-field .mat-mdc-floating-label,
@@ -58,7 +43,6 @@
   color: var(--color-text-secondary) !important;
 }
 
-/* Focused state for label */
 .themed-form-field.mat-focused .mat-mdc-floating-label,
 .themed-form-field.mat-focused .themed-label {
   color: var(--color-accent) !important;
@@ -79,13 +63,17 @@
   border-bottom-right-radius: 0.5rem !important;
 }
 
-/* Input text color and caret color */
 .themed-input {
   color: var(--color-text-primary) !important;
   caret-color: var(--color-accent) !important;
-  padding: 0.4rem 0.6rem !important;
-  font-size: 0.8rem !important;
+  padding: 0.4rem 0.6rem !important; /* Reduced padding for smaller input */
+  font-size: 0.8rem !important; /* Optionally reduce font size */
   border-radius: 0.5rem !important;
+}
+
+/* Color material icons inside form fields */
+.themed-form-field mat-icon {
+  color: var(--color-accent) !important;
 }
 
 /* Fix for autofill styles */
@@ -102,24 +90,14 @@
   caret-color: var(--color-accent) !important;
 }
 
-/* Underline for 'fill' and 'standard' appearance when focused */
 .themed-form-field .mdc-line-ripple::after {
   border-bottom-color: var(--color-accent) !important;
 }
 
-/* Outline color for 'outline' appearance when focused */
-.themed-form-field.mat-focused .mat-mdc-notched-outline__leading,
-.themed-form-field.mat-focused .mat-mdc-notched-outline__notch,
-.themed-form-field.mat-focused .mat-mdc-notched-outline__trailing {
-  border-color: var(--color-accent) !important;
-}
-
-/* Arrow color for select (if any) */
 .themed-form-field .mat-mdc-select-arrow svg {
   fill: var(--color-text-secondary) !important;
 }
 
-/* Button Styles */
 .primary-button {
   background-color: var(--color-accent) !important;
   color: var(--color-accent-contrast) !important;
@@ -171,24 +149,23 @@
   color: var(--color-error) !important;
 }
 
+/* Entrance animation */
+.animate-enter {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: enterAnimation 0.3s ease-out forwards;
+}
+@keyframes enterAnimation {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Styling for mat-error */
 :host ::ng-deep .mat-mdc-form-field-error {
   color: var(--color-error) !important;
   font-size: 0.75rem !important; /* Adjust as needed */
   margin-top: 0.25rem !important; /* Add some space above the error */
   display: block; /* Ensure it takes its own line if not already */
-}
-
-.divider-container hr {
-  border-color: var(--surface-border);
-}
-
-.divider-container span {
-  color: var(--color-text-secondary);
-  font-size: 0.75rem; /* text-xs */
-}
-
-/* Accent color for prefix icons */
-.themed-form-field mat-icon {
-  color: var(--color-accent) !important;
 }

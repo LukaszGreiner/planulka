@@ -36,55 +36,96 @@ import { Auth } from '@angular/fire/auth';
     MatDialogModule,
   ],
   template: `
-    <h2 mat-dialog-title>{{ isEditMode ? 'Edit Task' : 'Add New Task' }}</h2>
+    <h2 mat-dialog-title class="!text-[var(--color-text-primary)]">
+      {{ isEditMode ? 'Edit Task' : 'Add New Task' }}
+    </h2>
     <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
-      <mat-dialog-content>
-        <mat-form-field appearance="fill">
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" />
+      <mat-dialog-content
+        class="!bg-[var(--surface-dialog)] !text-[var(--color-text-primary)]"
+      >
+        <mat-form-field appearance="fill" class="w-full mb-4">
+          <mat-label class="!text-[var(--color-text-secondary)]"
+            >Title</mat-label
+          >
+          <input
+            matInput
+            formControlName="title"
+            class="!text-[var(--color-text-primary)]"
+          />
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Description</mat-label>
-          <textarea matInput formControlName="description"></textarea>
+        <mat-form-field appearance="fill" class="w-full mb-4">
+          <mat-label class="!text-[var(--color-text-secondary)]"
+            >Description</mat-label
+          >
+          <textarea
+            matInput
+            formControlName="description"
+            class="!text-[var(--color-text-primary)]"
+          ></textarea>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Priority</mat-label>
-          <mat-select formControlName="priority">
+        <mat-form-field appearance="fill" class="w-full mb-4">
+          <mat-label class="!text-[var(--color-text-secondary)]"
+            >Priority</mat-label
+          >
+          <mat-select
+            formControlName="priority"
+            class="!text-[var(--color-text-primary)]"
+          >
             <mat-option *ngFor="let priority of priorities" [value]="priority">
               {{ priority | titlecase }}
             </mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Status</mat-label>
-          <mat-select formControlName="status">
+        <mat-form-field appearance="fill" class="w-full mb-4">
+          <mat-label class="!text-[var(--color-text-secondary)]"
+            >Status</mat-label
+          >
+          <mat-select
+            formControlName="status"
+            class="!text-[var(--color-text-primary)]"
+          >
             <mat-option *ngFor="let status of statuses" [value]="status">
               {{ status | titlecase }}
             </mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Due Date</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="dueDate" />
+        <mat-form-field appearance="fill" class="w-full mb-4">
+          <mat-label class="!text-[var(--color-text-secondary)]"
+            >Due Date</mat-label
+          >
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="dueDate"
+            class="!text-[var(--color-text-primary)]"
+          />
           <mat-datepicker-toggle
             matSuffix
             [for]="picker"
+            class="!text-[var(--color-accent)]"
           ></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
       </mat-dialog-content>
 
-      <div mat-dialog-actions>
-        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+      <div mat-dialog-actions class="!bg-[var(--surface-dialog)]">
+        <button
+          mat-button
+          type="button"
+          (click)="onCancel()"
+          class="!text-[var(--color-text-secondary)] hover:!bg-[var(--surface-hover)]"
+        >
+          Cancel
+        </button>
         <button
           mat-raised-button
-          color="primary"
           type="submit"
           [disabled]="!taskForm.valid"
+          class="!bg-[var(--color-accent)] !text-[var(--color-accent-contrast)] hover:!bg-opacity-90 disabled:!bg-[var(--color-accent-disabled)]"
         >
           {{ isEditMode ? 'Save Changes' : 'Create Task' }}
         </button>
@@ -93,33 +134,169 @@ import { Auth } from '@angular/fire/auth';
   `,
   styles: [
     `
-      mat-form-field {
-        width: 100%;
-        margin-bottom: 1rem;
+      /* Ensure dialog takes theme variables */
+      :host {
+        display: block;
+        /* background-color: var(--surface-dialog); Dialog itself is styled via ::ng-deep */
+        color: var(--color-text-primary);
       }
 
+      /* Dialog container and surface */
+      ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+        background-color: var(--surface-dialog) !important;
+        color: var(--color-text-primary) !important;
+      }
+
+      /* Input Background & Text Color */
+      .mat-mdc-form-field
+        .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+        background-color: var(--surface-input) !important;
+      }
+      .mat-mdc-input-element {
+        color: var(--color-text-primary) !important;
+      }
+      /* Text color for the selected value in a mat-select */
+      .mat-mdc-select-value-text {
+        color: var(--color-text-primary) !important;
+      }
+
+      /* Label Colors */
+      .mat-mdc-form-field .mdc-floating-label {
+        color: var(--color-text-secondary) !important;
+      }
+      .mat-mdc-form-field.mat-focused .mdc-floating-label {
+        color: var(
+          --color-text-primary
+        ) !important; /* Changed from accent to primary for contrast */
+      }
+      .mat-mdc-form-field .mdc-text-field--filled .mdc-line-ripple::after {
+        border-bottom-color: var(
+          --color-accent
+        ) !important; /* Ripple remains accent */
+      }
+
+      /* MatSelect Dropdown Panel and Options */
+      ::ng-deep .mat-mdc-select-panel {
+        background-color: var(--surface-dialog) !important;
+      }
+      .mat-mdc-option {
+        background-color: transparent !important;
+        color: var(--color-text-primary) !important;
+      }
+      .mat-mdc-option .mdc-list-item__primary-text {
+        color: var(--color-text-primary) !important;
+      }
+      /* Hover/Active state for options */
+      .mat-mdc-option.mat-mdc-option-active,
+      .mat-mdc-option:focus:not(.mat-mdc-option-selected),
+      .mat-mdc-option:hover:not(.mat-mdc-option-selected) {
+        background-color: var(--surface-hover) !important;
+      }
+      .mat-mdc-option.mat-mdc-option-active .mdc-list-item__primary-text,
+      .mat-mdc-option:focus:not(.mat-mdc-option-selected)
+        .mdc-list-item__primary-text,
+      .mat-mdc-option:hover:not(.mat-mdc-option-selected)
+        .mdc-list-item__primary-text {
+        color: var(--color-text-primary) !important;
+      }
+
+      /* Style for the checkmark of a selected mat-option to be orange */
+      ::ng-deep
+        .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
+        .mat-pseudo-checkbox {
+        background: transparent !important; /* Ensure no background on the box itself */
+        border-color: transparent !important; /* Ensure no border on the box itself */
+      }
+      ::ng-deep
+        .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
+        .mat-pseudo-checkbox::after {
+        /* This pseudo-element is the checkmark path */
+        color: var(
+          --color-accent
+        ) !important; /* Make the checkmark icon orange */
+      }
+
+      /* Select arrow color */
+      .mat-mdc-select-arrow svg {
+        fill: var(--color-text-secondary) !important;
+      }
+
+      /* Datepicker toggle icon color */
+      .mat-datepicker-toggle .mat-icon {
+        color: var(--color-accent) !important;
+      }
+      ::ng-deep .mat-datepicker-content {
+        background-color: var(--surface-dialog) !important;
+        color: var(
+          --color-text-primary
+        ) !important; /* Ensure default text color for content */
+        border: 1px solid var(--surface-border) !important; /* Add border to datepicker popup */
+      }
+      ::ng-deep .mat-calendar-header {
+        background-color: var(
+          --surface-dialog
+        ) !important; /* Match dialog background */
+        padding: 0.5rem 0; /* Adjust padding as needed */
+      }
+      ::ng-deep
+        .mat-calendar-controls
+        .mat-calendar-period-button
+        .mdc-button__label,
+      ::ng-deep .mat-calendar-controls .mat-calendar-arrow {
+        color: var(--color-text-primary) !important;
+        fill: var(--color-text-primary) !important;
+      }
+      ::ng-deep .mat-calendar-table-header th {
+        /* Day of the week labels */
+        color: var(--color-text-secondary) !important;
+      }
+      ::ng-deep .mat-calendar-body-label,
+      ::ng-deep .mat-calendar-table-header,
+      ::ng-deep .mat-calendar-date,
+      ::ng-deep .mat-calendar-body-cell-content,
+      ::ng-deep .mat-date-range-input-separator {
+        color: var(--color-text-primary) !important;
+      }
+      ::ng-deep
+        .mat-calendar-body-cell:not(.mat-calendar-body-disabled)
+        .mat-calendar-body-cell-content:hover {
+        background-color: var(--surface-hover) !important;
+      }
+      ::ng-deep
+        .mat-calendar-body-today:not(.mat-calendar-body-selected)
+        .mat-calendar-body-cell-content {
+        border-color: var(
+          --color-text-secondary
+        ) !important; /* Subtle border for today */
+      }
+      ::ng-deep .mat-calendar-arrow {
+        fill: var(--color-text-primary) !important;
+      }
+      ::ng-deep .mat-calendar-body-selected {
+        background-color: var(--color-accent) !important;
+        color: var(--color-accent-contrast) !important;
+      }
+      ::ng-deep
+        .mat-calendar-body-active
+        > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+        background-color: var(--surface-hover) !important;
+      }
+
+      /* Dialog Actions */
       div[mat-dialog-actions] {
         justify-content: flex-end;
+        padding: 8px 24px 24px 24px;
+        border-top: 1px solid var(--surface-border); /* Optional: add a separator */
       }
 
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      mat-dialog-content::-webkit-scrollbar {
-        display: none;
-      }
-
-      /* Hide scrollbar for IE, Edge and Firefox */
+      /* Scrollbar styling */
       mat-dialog-content {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+        overflow: hidden !important; /* Force hide overflow */
+        -ms-overflow-style: none !important; /* IE and Edge */
+        scrollbar-width: none !important; /* Firefox */
       }
-
-      textarea::-webkit-scrollbar {
-        display: none;
-      }
-
-      textarea {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+      mat-dialog-content::-webkit-scrollbar {
+        display: none !important; /* Hide webkit scrollbar */
       }
     `,
   ],

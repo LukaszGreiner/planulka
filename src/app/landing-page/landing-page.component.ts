@@ -8,5 +8,6 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [MatCardModule, MatButtonModule, RouterLink],
   templateUrl: './landing-page.component.html',
+  styleUrls: ['./landing-page.component.css'],
 })
 export class LandingPageComponent {}

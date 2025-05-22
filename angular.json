@@ -35,10 +35,7 @@
                 "output": "icons"
               }
             ],
-            "styles": [
-              "@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -99,10 +96,7 @@
                 "output": "icons"
               }
             ],
-            "styles": [
-              "@angular/material/prebuilt-themes/rose-red.css",
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         }

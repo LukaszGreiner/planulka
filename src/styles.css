@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+:root {
+  /* ... other variables ... */
+  --color-accent: #ffa500; /* Orange */
+  --color-accent-contrast: #000000; /* Black - for text on orange accent */
+  --color-accent-disabled: #ffdab9; /* Lighter orange for disabled state */
+
+  /* Dark Theme Palette */
+  --color-primary: #374151; /* Dark Gray - For primary UI elements like headers */
+  --color-primary-contrast: #ffffff; /* White - Text on primary elements */
+
+  --color-text-primary: #e5e7eb; /* Light Gray - Main text color */
+  --color-text-secondary: #9ca3af; /* Medium Gray - Secondary text, placeholders */
+  --color-text-disabled: #6b7280; /* Darker Gray - Disabled text */
+
+  --surface-ground: #111827; /* Very Dark Blue/Gray - Main app background */
+  --surface-card: #1f2937; /* Dark Blue/Gray - Card backgrounds, sidebars */
+  --surface-dialog: #374151; /* Dark Gray - Dialogs, modals */
+  --surface-input: #4b5563; /* Medium-Dark Gray - Input field backgrounds */
+  --surface-hover: #4b5563; /* Medium-Dark Gray - Hover states */
+  --surface-border: #4b5563; /* Medium-Dark Gray - Borders */
+  --surface-scrollbar: #6b7280; /* Darker Gray - Scrollbar thumbs */
+
+  /* Status Colors */
+  --color-success: #10b981; /* Green */
+  --color-warning: #f59e0b; /* Amber */
+  --color-error: #ef4444; /* Red */
+  --color-info: #3b82f6; /* Blue */
+
+  /* Priority Colors */
+  --priority-low: #34d399; /* Emerald 300 */
+  --priority-medium: #fbbf24; /* Amber 400 */
+  --priority-high: #f87171; /* Red 400 */
+}
+
 html,
 body {
   height: 100%;
@@ -7,4 +41,46 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Global Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* Added for horizontal scrollbars if they appear */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-input);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--surface-scrollbar);
+  border-radius: 4px;
+  border: 2px solid var(--surface-input); /* Creates padding around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-accent);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-scrollbar) var(--surface-input);
+}
+
+/* Global override for Material select dropdown */
+.cdk-overlay-container .mat-mdc-select-panel {
+  background-color: var(--surface-card) !important;
+  opacity: 1 !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 0.5rem !important;
+}
+.cdk-overlay-container .mat-mdc-option {
+  color: var(--color-text-primary) !important;
+  background-color: var(--surface-card) !important;
+}
+.cdk-overlay-container .mat-mdc-option.mat-selected {
+  background-color: var(--surface-hover) !important;
 }

@@ -1,78 +1,174 @@
 <div
-  class="flex min-h-screen items-center justify-center bg-gradient-to-br from-celadon to-fawn"
+  class="auth-page-container flex items-center justify-center min-h-screen p-4"
 >
   <form
-    class="bg-white/90 rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-6 border border-gray-200"
+    [formGroup]="signupForm"
+    class="auth-card backdrop-blur-md bg-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37)] animate-enter flex flex-col gap-6 p-8 w-full max-w-md"
     autocomplete="on"
     (ngSubmit)="signupWithEmail()"
   >
-    <h2 class="text-3xl font-bold text-center text-hunter-green mb-2">
+    <img
+      src="assets/images/logo.png"
+      alt="Planulka Logo"
+      class="auth-logo mx-auto mb-4 h-16 w-16 md:h-20 md:w-20"
+    />
+    <h2 class="text-2xl md:text-3xl font-bold text-center title-text mb-2">
       Zarejestruj się
     </h2>
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Email</mat-label>
+    <mat-form-field
+      appearance="outline"
+      floatLabel="auto"
+      class="w-full themed-form-field"
+    >
+      <mat-icon matPrefix>email</mat-icon>
       <input
         matInput
         type="email"
-        required
+        formControlName="email"
+        placeholder="Email"
         autocomplete="email"
-        class="!bg-transparent"
-        [(ngModel)]="email"
-        name="email"
+        class="themed-input"
       />
+      <mat-error
+        *ngIf="
+          signupForm.get('email')?.hasError('required') &&
+          signupForm.get('email')?.touched
+        "
+      >
+        Email jest wymagany.
+      </mat-error>
+      <mat-error
+        *ngIf="
+          signupForm.get('email')?.hasError('email') &&
+          signupForm.get('email')?.touched
+        "
+      >
+        Proszę podać poprawny adres email.
+      </mat-error>
+      <mat-error
+        *ngIf="
+          signupForm.get('email')?.hasError('emailInUse') &&
+          signupForm.get('email')?.touched
+        "
+      >
+        Ten adres email jest już zajęty.
+      </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Hasło</mat-label>
+    <mat-form-field
+      appearance="outline"
+      floatLabel="auto"
+      class="w-full themed-form-field"
+    >
+      <mat-icon matPrefix>lock</mat-icon>
       <input
         matInput
-        type="password"
-        required
-        minlength="6"
+        [type]="hidePassword ? 'password' : 'text'"
+        formControlName="password"
+        placeholder="Hasło"
         autocomplete="new-password"
-        class="!bg-transparent"
-        [(ngModel)]="password"
-        name="password"
+        class="themed-input"
       />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="togglePasswordVisibility()"
+        aria-label="Toggle password visibility"
+      >
+        <mat-icon>{{
+          hidePassword ? "visibility_off" : "visibility"
+        }}</mat-icon>
+      </button>
+      <mat-error
+        *ngIf="
+          signupForm.get('password')?.hasError('required') &&
+          signupForm.get('password')?.touched
+        "
+      >
+        Hasło jest wymagane.
+      </mat-error>
+      <mat-error
+        *ngIf="
+          signupForm.get('password')?.hasError('minlength') &&
+          signupForm.get('password')?.touched
+        "
+      >
+        Hasło musi mieć co najmniej 6 znaków.
+      </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Powtórz hasło</mat-label>
+    <mat-form-field
+      appearance="outline"
+      floatLabel="auto"
+      class="w-full themed-form-field"
+    >
+      <mat-icon matPrefix>lock</mat-icon>
       <input
         matInput
-        type="password"
-        required
-        minlength="6"
+        [type]="hideRepeatPassword ? 'password' : 'text'"
+        formControlName="repeatPassword"
+        placeholder="Powtórz hasło"
         autocomplete="new-password"
-        class="!bg-transparent"
-        [(ngModel)]="repeatPassword"
-        name="repeatPassword"
+        class="themed-input"
       />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="toggleRepeatPasswordVisibility()"
+        aria-label="Toggle password visibility"
+      >
+        <mat-icon>{{
+          hideRepeatPassword ? "visibility_off" : "visibility"
+        }}</mat-icon>
+      </button>
+      <mat-error
+        *ngIf="
+          signupForm.get('repeatPassword')?.hasError('required') &&
+          signupForm.get('repeatPassword')?.touched
+        "
+      >
+        Proszę powtórzyć hasło.
+      </mat-error>
+      <mat-error
+        *ngIf="
+          signupForm.hasError('passwordsMismatch') &&
+          (signupForm.get('password')?.touched ||
+            signupForm.get('repeatPassword')?.touched)
+        "
+      >
+        Hasła nie są takie same.
+      </mat-error>
     </mat-form-field>
     <button
       mat-flat-button
-      color="primary"
-      class="w-full !bg-hunter-green !text-white py-2 text-lg rounded-lg shadow transition hover:scale-105"
+      class="w-full gradient-button py-3 text-lg font-semibold rounded-lg shadow transition hover:scale-105"
       type="submit"
+      [disabled]="signupForm.invalid"
     >
       Zarejestruj się
     </button>
+    <div class="divider-container flex items-center my-2">
+      <hr class="flex-grow border-t border-[var(--surface-border)]" />
+      <span class="px-2 text-xs secondary-text">LUB</span>
+      <hr class="flex-grow border-t border-[var(--surface-border)]" />
+    </div>
     <button
       type="button"
       (click)="signupWithGoogle()"
       mat-stroked-button
-      color="primary"
-      class="w-full flex items-center justify-center gap-2 border-hunter-green text-hunter-green mt-2 py-2 rounded-lg shadow hover:bg-celadon transition"
+      class="w-full google-button flex items-center justify-center gap-2 mt-2 py-3 rounded-lg shadow hover:scale-105 transition"
     >
-      <mat-icon svgIcon="google" class="mr-2"></mat-icon>
+      <mat-icon svgIcon="google" class="google-icon"></mat-icon>
       Zarejestruj się przez Google
     </button>
-    <div *ngIf="error" class="text-red-600 text-center text-sm mt-2">
+    <div *ngIf="error" class="error-message text-center text-sm mt-2">
       {{ error }}
     </div>
-    <div class="text-center text-sm text-gray-500 mt-2">
+    <div class="text-center text-sm secondary-text mt-2">
       Masz już konto?
       <a
         routerLink="/auth/login"
-        class="text-tangerine font-semibold hover:underline"
+        class="accent-link font-semibold hover:underline"
         >Zaloguj się</a
       >
     </div>

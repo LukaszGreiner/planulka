@@ -23,11 +23,13 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     MatButtonModule,
   ],
-  templateUrl: './login-page.component.html', // Updated to match the file name
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent {
   error: string = '';
   form: FormGroup;
+  hide: boolean = true; // password visibility toggle
   private fb: FormBuilder = inject(FormBuilder);
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
@@ -45,6 +47,10 @@ export class LoginPageComponent {
       ],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.hide = !this.hide;
   }
 
   onSubmit(): void {
