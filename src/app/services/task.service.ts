@@ -86,6 +86,7 @@ export class TaskService {
     userId: string | null,
     statusFilter: 'todo' | 'in_progress' | 'done' | null,
     sortBy: 'priority' | 'createdAt' | null,
+    sortOrder: 'asc' | 'desc',
     isAdmin: boolean
   ): Observable<Task[]> {
     let q = query(this.tasksCollection);
@@ -99,32 +100,36 @@ export class TaskService {
     }
 
     if (sortBy) {
-      q = query(q, orderBy(sortBy));
+      q = query(q, orderBy(sortBy, sortOrder));
     }
 
+    console.log('Querying tasks with:', {
+      userId,
+      statusFilter,
+      sortBy,
+      sortOrder,
+      isAdmin,
+    });
+
     return collectionData(q, { idField: 'id' }).pipe(
-      map(
-        (tasks: any[]) =>
-          tasks.map((task: any) => ({
-            ...task,
-            dueDate:
-              task.dueDate instanceof Timestamp
-                ? task.dueDate.toDate()
-                : task.dueDate,
-            createdAt:
-              task.createdAt instanceof Timestamp
-                ? task.createdAt.toDate()
-                : task.createdAt,
-            updatedAt:
-              task.updatedAt instanceof Timestamp
-                ? task.updatedAt.toDate()
-                : task.updatedAt,
-            completedAt:
-              task.completedAt instanceof Timestamp
-                ? task.completedAt.toDate()
-                : task.completedAt,
-          })) as Task[]
-      )
+      map((tasks: any[]) => {
+        console.log('Fetched tasks:', tasks);
+        return tasks.map((task: any) => ({
+          ...task,
+          dueDate:
+            task.dueDate instanceof Timestamp
+              ? task.dueDate.toDate()
+              : task.dueDate,
+          createdAt:
+            task.createdAt instanceof Timestamp
+              ? task.createdAt.toDate()
+              : task.createdAt,
+          updatedAt:
+            task.updatedAt instanceof Timestamp
+              ? task.updatedAt.toDate()
+              : task.updatedAt,
+        }));
+      })
     );
   }
 

@@ -1,1 +1,7 @@
-<p>admin-panel works!</p>
+<mat-form-field appearance="fill">
+  <mat-label>Sort Order</mat-label>
+  <mat-select [formControl]="sortOrder">
+    <mat-option value="asc">Ascending</mat-option>
+    <mat-option value="desc">Descending</mat-option>
+  </mat-select>
+</mat-form-field>

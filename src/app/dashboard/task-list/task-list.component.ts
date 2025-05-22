@@ -12,6 +12,7 @@ import { TaskService } from '../../services/task.service';
 import { Auth } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
 
 @Component({
   selector: 'app-task-list',
@@ -26,19 +27,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     MatSelectModule,
     MatFormFieldModule,
     ReactiveFormsModule,
+    TaskFilterPipe,
   ],
   template: `
     <div class="task-list-container">
       <div class="filters">
-        <mat-form-field appearance="fill">
-          <mat-label>Filter by Status</mat-label>
-          <mat-select [formControl]="statusFilter">
-            <mat-option value="">All</mat-option>
-            <mat-option value="todo">To Do</mat-option>
-            <mat-option value="in_progress">In Progress</mat-option>
-            <mat-option value="done">Done</mat-option>
-          </mat-select>
-        </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Sort by</mat-label>
           <mat-select [formControl]="sortBy">
@@ -47,56 +40,185 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
             <mat-option value="createdAt">Creation Date</mat-option>
           </mat-select>
         </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Sort Order</mat-label>
+          <mat-select [formControl]="sortOrder">
+            <mat-option value="asc">Ascending</mat-option>
+            <mat-option value="desc">Descending</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-      <div *ngIf="tasks.length > 0; else noTasks" class="task-list">
-        <mat-card *ngFor="let task of tasks" class="task-card">
-          <mat-card-header>
-            <mat-card-title>{{ task.title }}</mat-card-title>
-            <mat-card-subtitle>
-              Priority: {{ task.priority | titlecase }} | Status:
-              {{ task.status | titlecase }} | Due:
-              {{ task.dueDate | date : 'shortDate' }}
-            </mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <p>{{ task.description }}</p>
-          </mat-card-content>
-          <mat-card-actions align="end">
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="editTask(task)"
-              aria-label="Edit task"
-              *ngIf="isOwnerOrAdmin(task)"
+
+      <div class="columns-container">
+        <div class="task-column">
+          <h2 class="column-title">To Do</h2>
+          <div class="task-list">
+            <mat-card
+              *ngFor="let task of tasks | taskFilter : 'todo'"
+              class="task-card"
             >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="accent"
-              (click)="toggleComplete(task)"
-              [disabled]="task.status === 'done' || !isOwnerOrAdmin(task)"
-              aria-label="Mark as completed"
+              <mat-card-header>
+                <mat-card-title>{{ task.title }}</mat-card-title>
+                <mat-card-subtitle>
+                  Priority: {{ task.priority | titlecase }} | Due:
+                  {{ task.dueDate | date : 'shortDate' }}
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ task.description }}</p>
+              </mat-card-content>
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="editTask(task)"
+                  aria-label="Edit task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  [color]="getStatusColor(task)"
+                  (click)="toggleComplete(task)"
+                  [disabled]="!isOwnerOrAdmin(task)"
+                  aria-label="Toggle task status"
+                >
+                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteTask(task)"
+                  aria-label="Delete task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+            <p
+              *ngIf="(tasks | taskFilter : 'todo').length === 0"
+              class="no-tasks-message"
             >
-              <mat-icon>check_circle</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="warn"
-              (click)="deleteTask(task)"
-              aria-label="Delete task"
-              *ngIf="isOwnerOrAdmin(task)"
+              No tasks to do
+            </p>
+          </div>
+        </div>
+
+        <div class="task-column">
+          <h2 class="column-title">In Progress</h2>
+          <div class="task-list">
+            <mat-card
+              *ngFor="let task of tasks | taskFilter : 'in_progress'"
+              class="task-card"
             >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </mat-card-actions>
-        </mat-card>
+              <mat-card-header>
+                <mat-card-title>{{ task.title }}</mat-card-title>
+                <mat-card-subtitle>
+                  Priority: {{ task.priority | titlecase }} | Due:
+                  {{ task.dueDate | date : 'shortDate' }}
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ task.description }}</p>
+              </mat-card-content>
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="editTask(task)"
+                  aria-label="Edit task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  [color]="getStatusColor(task)"
+                  (click)="toggleComplete(task)"
+                  [disabled]="!isOwnerOrAdmin(task)"
+                  aria-label="Toggle task status"
+                >
+                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteTask(task)"
+                  aria-label="Delete task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+            <p
+              *ngIf="(tasks | taskFilter : 'in_progress').length === 0"
+              class="no-tasks-message"
+            >
+              No tasks in progress
+            </p>
+          </div>
+        </div>
+
+        <div class="task-column">
+          <h2 class="column-title">Done</h2>
+          <div class="task-list">
+            <mat-card
+              *ngFor="let task of tasks | taskFilter : 'done'"
+              class="task-card"
+            >
+              <mat-card-header>
+                <mat-card-title>{{ task.title }}</mat-card-title>
+                <mat-card-subtitle>
+                  Priority: {{ task.priority | titlecase }} | Due:
+                  {{ task.dueDate | date : 'shortDate' }}
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ task.description }}</p>
+              </mat-card-content>
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="editTask(task)"
+                  aria-label="Edit task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  [color]="getStatusColor(task)"
+                  (click)="toggleComplete(task)"
+                  [disabled]="!isOwnerOrAdmin(task)"
+                  aria-label="Toggle task status"
+                >
+                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteTask(task)"
+                  aria-label="Delete task"
+                  *ngIf="isOwnerOrAdmin(task)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+            <p
+              *ngIf="(tasks | taskFilter : 'done').length === 0"
+              class="no-tasks-message"
+            >
+              No completed tasks
+            </p>
+          </div>
+        </div>
       </div>
-      <ng-template #noTasks>
-        <p class="no-tasks-message">
-          No tasks found for the current user. Add one!
-        </p>
-      </ng-template>
     </div>
   `,
   styles: [
@@ -107,48 +229,100 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
         gap: 1rem;
         padding: 1rem;
       }
+
       .filters {
         display: flex;
         gap: 1rem;
         margin-bottom: 1rem;
       }
+
+      .columns-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        min-height: calc(100vh - 200px);
+      }
+
+      .task-column {
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-y: auto; /* Enable vertical scrolling */
+        max-height: calc(
+          100vh - 250px
+        ); /* Prevent overflow beyond screen height */
+      }
+
+      .column-title {
+        margin: 0 0 1rem 0;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: 500;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
       .task-list {
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        min-height: 100px;
       }
+
       .task-card {
         margin-bottom: 1rem;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: box-shadow 0.3s ease-in-out;
+        background-color: white;
       }
+
       .task-card:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: none; /* Removed hover effect from task card */
       }
+
+      mat-card-actions button {
+        transition: transform 0.2s ease-in-out;
+      }
+
+      mat-card-actions button:hover {
+        transform: scale(1.1); /* Added hover effect for task buttons */
+      }
+
       mat-card-header {
         padding-bottom: 0.5rem;
       }
+
       mat-card-title {
         font-size: 1.25rem;
         font-weight: 500;
       }
+
       mat-card-subtitle {
         font-size: 0.875rem;
         color: #666;
       }
+
       mat-card-content p {
         margin-bottom: 1rem;
         white-space: pre-wrap;
       }
+
       mat-card-actions {
         padding-top: 0.5rem;
         border-top: 1px solid #eee;
       }
+
       .no-tasks-message {
         text-align: center;
         padding: 2rem;
         font-style: italic;
         color: #888;
+      }
+
+      @media (max-width: 1024px) {
+        .columns-container {
+          grid-template-columns: 1fr;
+        }
       }
     `,
   ],
@@ -163,6 +337,7 @@ export class TaskListComponent implements OnInit {
   private roleLoaded = false;
   statusFilter = new FormControl('');
   sortBy = new FormControl('');
+  sortOrder = new FormControl('asc');
 
   ngOnInit(): void {
     this.loadUserRole().then(() => {
@@ -202,14 +377,12 @@ export class TaskListComponent implements OnInit {
           isAdmin ? null : currentUser.uid,
           this.statusFilter.value as 'todo' | 'in_progress' | 'done' | null,
           this.sortBy.value as 'priority' | 'createdAt' | null,
+          this.sortOrder.value as 'asc' | 'desc',
           isAdmin
         )
         .subscribe((tasks) => {
           console.log('Tasks fetched:', tasks);
-          this.tasks = tasks.sort(
-            (a, b) =>
-              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-          );
+          this.tasks = tasks;
         });
     }
   }
@@ -217,6 +390,7 @@ export class TaskListComponent implements OnInit {
   subscribeToFilters(): void {
     this.statusFilter.valueChanges.subscribe(() => this.loadTasks());
     this.sortBy.valueChanges.subscribe(() => this.loadTasks());
+    this.sortOrder.valueChanges.subscribe(() => this.loadTasks());
   }
 
   isOwnerOrAdmin(task: Task): boolean {
@@ -246,7 +420,14 @@ export class TaskListComponent implements OnInit {
 
   toggleComplete(task: Task): void {
     if (!task.id || !this.isOwnerOrAdmin(task)) return;
-    const newStatus: TaskStatus = task.status === 'done' ? 'todo' : 'done';
+    const newStatus: TaskStatus =
+      task.status === 'done'
+        ? 'todo'
+        : task.status === 'todo'
+        ? 'in_progress'
+        : task.status === 'in_progress'
+        ? 'done'
+        : 'todo';
     const updatedTask: Partial<Task> = {
       status: newStatus,
       updatedAt: new Date(),
@@ -262,5 +443,24 @@ export class TaskListComponent implements OnInit {
     this.taskService.deleteTask(task.id).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t.id !== task.id);
     });
+  }
+
+  getStatusColor(task: Task): string {
+    if (task.status === 'done') {
+      return 'accent';
+    } else if (task.status === 'in_progress') {
+      return 'primary';
+    } else {
+      return 'warn';
+    }
+  }
+  getStatusIcon(task: Task): string {
+    if (task.status === 'done') {
+      return 'task_alt';
+    } else if (task.status === 'in_progress') {
+      return 'pending_actions';
+    } else {
+      return 'radio_button_unchecked';
+    }
   }
 }

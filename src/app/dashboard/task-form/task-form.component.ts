@@ -35,8 +35,94 @@ import { Auth } from '@angular/fire/auth';
     MatSelectModule,
     MatDialogModule,
   ],
-  templateUrl: './task-form.component.html',
-  styleUrls: ['./task-form.component.css'],
+  template: `
+    <h2 mat-dialog-title>{{ isEditMode ? 'Edit Task' : 'Add New Task' }}</h2>
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <mat-dialog-content>
+        <mat-form-field appearance="fill">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Priority</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option *ngFor="let priority of priorities" [value]="priority">
+              {{ priority | titlecase }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let status of statuses" [value]="status">
+              {{ status | titlecase }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Due Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dueDate" />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </mat-dialog-content>
+
+      <div mat-dialog-actions>
+        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="!taskForm.valid"
+        >
+          {{ isEditMode ? 'Save Changes' : 'Create Task' }}
+        </button>
+      </div>
+    </form>
+  `,
+  styles: [
+    `
+      mat-form-field {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      div[mat-dialog-actions] {
+        justify-content: flex-end;
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      mat-dialog-content::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Hide scrollbar for IE, Edge and Firefox */
+      mat-dialog-content {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      textarea::-webkit-scrollbar {
+        display: none;
+      }
+
+      textarea {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+    `,
+  ],
 })
 export class TaskFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -56,18 +142,17 @@ export class TaskFormComponent implements OnInit {
 
     this.taskForm = this.fb.group({
       title: [task?.title || '', Validators.required],
-      description: [task?.description || '', Validators.required],
-      priority: [task?.priority || 'medium', Validators.required],
+      description: [task?.description || ''],
+      priority: [task?.priority || 'low', Validators.required],
       status: [task?.status || 'todo', Validators.required],
-      dueDate: [
-        task?.dueDate ? new Date(task.dueDate) : new Date(),
-        Validators.required,
-      ],
-      tags: [task?.tags?.join(', ') || ''], // Optional: if tags exist in Task model
+      dueDate: [task?.dueDate ? new Date(task.dueDate) : null],
+      tags: [task?.tags?.join(', ') || ''],
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Initialization logic if needed
+  }
 
   onSubmit(): void {
     if (this.taskForm.valid) {
@@ -78,7 +163,6 @@ export class TaskFormComponent implements OnInit {
       }
       const formValue = this.taskForm.value;
 
-      // Handle tags as an array (if applicable)
       const tags = formValue.tags
         ? formValue.tags.split(',').map((tag: string) => tag.trim())
         : [];
@@ -104,7 +188,9 @@ export class TaskFormComponent implements OnInit {
           tags,
           createdAt: new Date(),
           updatedAt: new Date(),
+          status: 'todo',
           assignedUsers: [currentUser.uid],
+          completedAt: null,
         };
         this.taskService.addTask(newTask).subscribe({
           next: (taskId: string) => {

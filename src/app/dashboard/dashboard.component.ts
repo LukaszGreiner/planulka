@@ -5,11 +5,18 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { TaskFormComponent } from './task-form/task-form.component';
 import { TaskListComponent } from './task-list/task-list.component';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, TaskListComponent],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    TaskListComponent,
+    MatNativeDateModule,
+  ],
   template: `<div>
     <button
       mat-fab

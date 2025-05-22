@@ -68,6 +68,13 @@ interface UserProfile {
             <mat-option value="createdAt">Creation Date</mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Sort Order</mat-label>
+          <mat-select [formControl]="sortOrder">
+            <mat-option value="asc">Ascending</mat-option>
+            <mat-option value="desc">Descending</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
       <mat-table [dataSource]="tasks" class="mat-elevation-z8">
         <ng-container matColumnDef="title">
@@ -199,11 +206,12 @@ export class AdminPanelComponent implements OnInit {
   private router = inject(Router);
   userRole: 'admin' | 'user' | null = null;
   tasks: Task[] = [];
-  users$!: Observable<UserProfile[]>; // Tell TypeScript that the property will be assigned a value later
+  users$!: Observable<UserProfile[]>;
   taskColumns: string[] = ['title', 'priority', 'status', 'dueDate', 'actions'];
   userColumns: string[] = ['email', 'role', 'actions'];
   statusFilter = new FormControl('');
   sortBy = new FormControl('');
+  sortOrder = new FormControl('asc');
 
   ngOnInit(): void {
     this.authService.getUserRole().subscribe((role) => {
@@ -224,6 +232,7 @@ export class AdminPanelComponent implements OnInit {
         null, // Admins see all tasks, so no userId filter
         this.statusFilter.value as 'todo' | 'in_progress' | 'done' | null,
         this.sortBy.value as 'priority' | 'createdAt' | null,
+        this.sortOrder.value as 'asc' | 'desc',
         true // isAdmin = true
       )
       .subscribe((tasks) => {
@@ -254,6 +263,7 @@ export class AdminPanelComponent implements OnInit {
   subscribeToFilters(): void {
     this.statusFilter.valueChanges.subscribe(() => this.loadTasks());
     this.sortBy.valueChanges.subscribe(() => this.loadTasks());
+    this.sortOrder.valueChanges.subscribe(() => this.loadTasks());
   }
 
   async editTask(task: Task): Promise<void> {
