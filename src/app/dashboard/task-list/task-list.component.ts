@@ -31,9 +31,9 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
   ],
   template: `
     <div
-      class="task-list-container flex-1 flex items-center justify-center h-full"
+      class="task-list-container flex-1 flex items-center justify-center h-full my-12"
     >
-      <div class="filters">
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
         <mat-form-field
           appearance="fill"
           floatLabel="auto"
@@ -67,7 +67,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         <mat-form-field
           appearance="fill"
           floatLabel="auto"
-          class="themed-form-field"
+          class="themed-form-field w-full md:w-64"
         >
           <mat-icon matPrefix style="color: var(--color-accent)"
             >event</mat-icon
@@ -82,8 +82,8 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         </mat-form-field>
       </div>
 
-      <div class="columns-container">
-        <ng-container *ngFor="let col of columns">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <div *ngFor="let col of columns" class="w-full">
           <div class="task-column">
             <h2 class="column-title">{{ col.title }}</h2>
             <div class="task-list">
@@ -142,7 +142,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
               </p>
             </div>
           </div>
-        </ng-container>
+        </div>
       </div>
     </div>
   `,

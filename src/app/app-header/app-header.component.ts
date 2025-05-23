@@ -11,14 +11,9 @@ import { filter } from 'rxjs/operators';
   selector: 'app-header',
   template: `
     <header
-      class="app-header-container flex items-center justify-between px-4 shadow-md h-16"
+      class="bg-[var(--surface-card)] border-b-[var(--surface-border)] border-b-1 flex items-center justify-between shadow-md h-16 px-4 lg:px-8 w-full z-1 absolute"
     >
       <div class="flex items-center gap-2">
-        <!-- <img
-          src="assets/images/logo.png"
-          alt="Planulka Logo"
-          class="h-10 w-10 md:h-12 md:w-12"
-        /> -->
         <span
           class="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] cursor-default"
           >Planulka</span
@@ -45,11 +40,6 @@ import { filter } from 'rxjs/operators';
   `,
   styles: [
     `
-      .app-header-container {
-        background-color: var(--surface-card);
-        border-bottom: 1px solid var(--surface-border);
-      }
-
       .app-header-button {
         padding: 0.5rem 1rem;
         border-radius: 0.375rem; /* rounded-md */
