@@ -14,14 +14,15 @@
   margin: 0;
 }
 
-.filters {
+/* Filter toolbar styling */
+.filter-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.filters mat-form-field {
+.filter-toolbar mat-form-field {
   flex: 1;
   min-width: 200px;
 }
@@ -45,7 +46,8 @@
 }
 
 /* Ensure all panel-card text is high contrast */
-.panel-card, .panel-card * {
+.panel-card,
+.panel-card * {
   color: var(--color-text-primary) !important;
 }
 
@@ -55,7 +57,7 @@
 }
 
 /* Accent filter icons */
-.filters mat-icon {
+.filter-toolbar mat-icon {
   color: var(--color-accent) !important;
 }
 
@@ -77,12 +79,24 @@
   color: var(--color-text-primary) !important; /* Table content cells */
 }
 
-.admin-table .mat-row {
-  border-bottom: 1px solid var(--surface-border);
+/* Ensure cells have adequate padding */
+.admin-table .mat-header-cell,
+.admin-table .mat-cell {
+  padding: 1rem !important;
 }
 
+/* Zebra stripes for rows */
+.admin-table .mat-row:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Hover effect for rows */
 .admin-table .mat-row:hover {
-  background-color: rgba(255, 165, 0, 0.05);
+  background-color: rgba(255, 165, 0, 0.1);
+}
+
+.admin-table .mat-row {
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .users-heading {
@@ -149,6 +163,43 @@
 }
 .mat-mdc-option.mat-selected .mat-mdc-option-text {
   color: var(--color-text-primary) !important;
+}
+
+/* Card wrapper for tables */
+.table-card {
+  background-color: var(--surface-card);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+/* Table styling inside card */
+.table-card .admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 0.5rem !important;
+}
+.table-card .mat-header-row {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+.table-card .mat-header-cell {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+  font-weight: 600 !important;
+}
+.table-card .mat-cell {
+  font-size: 0.875rem;
+}
+.table-card .mat-header-cell,
+.table-card .mat-cell {
+  border-bottom: 1px solid var(--surface-border);
+}
+.table-card .mat-row:hover {
+  background-color: var(--surface-hover);
 }
 
 /* Reuse the entrance animation defined earlier */

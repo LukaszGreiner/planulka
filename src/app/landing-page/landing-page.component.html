@@ -1,27 +1,23 @@
-<div
-  class="landing-page-container flex flex-col items-center justify-center h-full p-4 w-full"
+<mat-card
+  class="landing-page-card flex flex-col items-center justify-center h-screen w-screen overflow-hidden text-white"
 >
-  <mat-card
-    class="landing-card p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-lg text-center"
+  <img
+    src="assets/images/logo.png"
+    alt="Planulka Logo"
+    class="mx-auto mb-6 h-20 w-20 md:h-24 md:w-24"
+  />
+  <h1 class="text-3xl md:text-4xl font-bold mb-4 title-text">
+    Witaj w Planulka!
+  </h1>
+  <p class="text-base md:text-lg subtitle-text mb-8">
+    Organizuj swój dzień z Planulka!<br />
+    Osiągaj zamierzone cele z łatwością.
+  </p>
+  <button
+    mat-raised-button
+    class="cta-button px-8 py-3 text-base md:text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+    routerLink="/auth/login"
   >
-    <img
-      src="assets/images/logo.png"
-      alt="Planulka Logo"
-      class="mx-auto mb-6 h-20 w-20 md:h-24 md:w-24"
-    />
-    <h1 class="text-3xl md:text-4xl font-bold mb-4 title-text">
-      Witaj w Planulka!
-    </h1>
-    <p class="text-base md:text-lg subtitle-text mb-8">
-      Organizuj swój dzień z Planulka!<br />
-      Osiągaj zamierzone cele z łatwością.
-    </p>
-    <button
-      mat-raised-button
-      class="cta-button px-8 py-3 text-base md:text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-      routerLink="/auth/login"
-    >
-      Zacznij już teraz!
-    </button>
-  </mat-card>
-</div>
+    Zacznij już teraz!
+  </button>
+</mat-card>

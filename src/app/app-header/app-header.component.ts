@@ -14,13 +14,13 @@ import { filter } from 'rxjs/operators';
       class="app-header-container flex items-center justify-between px-4 shadow-md h-16"
     >
       <div class="flex items-center gap-2">
-        <img
+        <!-- <img
           src="assets/images/logo.png"
           alt="Planulka Logo"
           class="h-10 w-10 md:h-12 md:w-12"
-        />
+        /> -->
         <span
-          class="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)]"
+          class="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] cursor-default"
           >Planulka</span
         >
       </div>
@@ -28,15 +28,15 @@ import { filter } from 'rxjs/operators';
         <button
           *ngIf="(user$ | async) && userRole === 'admin'"
           (click)="toggleView()"
-          class="app-header-button"
+          class="app-header-button cursor-pointer"
           [class.active]="isAdminPanelRoute"
         >
-          {{ isAdminPanelRoute ? 'Dashboard' : 'Admin Panel' }}
+          {{ isAdminPanelRoute ? 'Lista zadań' : 'Panel Admina' }}
         </button>
         <button
           *ngIf="user$ | async"
           (click)="logout()"
-          class="app-header-button logout-button"
+          class="app-header-button logout-button cursor-pointer"
         >
           Logout
         </button>

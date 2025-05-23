@@ -17,13 +17,15 @@ import { MatNativeDateModule } from '@angular/material/core';
     TaskListComponent,
     MatNativeDateModule,
   ],
-  template: `<div class="bg-[var(--surface-ground)] min-h-full relative">
+  template: `<div
+    class="bg-[var(--surface-ground)] min-h-full flex items-center justify-center pt-2"
+  >
     <button
       mat-fab
       (click)="openTaskDialog()"
       aria-label="Add new task"
       class="!bg-[var(--color-accent)] !text-white z-50 shadow-lg hover:!bg-opacity-90 !rounded-full"
-      style="position: fixed; bottom: 32px; right: 32px;"
+      style="position: fixed; bottom: 64px; right: 32px;"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

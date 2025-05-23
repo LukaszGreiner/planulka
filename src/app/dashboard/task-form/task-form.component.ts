@@ -37,7 +37,7 @@ import { Auth } from '@angular/fire/auth';
   ],
   template: `
     <h2 mat-dialog-title class="!text-[var(--color-text-primary)]">
-      {{ isEditMode ? 'Edit Task' : 'Add New Task' }}
+      {{ isEditMode ? 'Edytuj zadanie' : 'Dodaj nowe zadanie' }}
     </h2>
     <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content
@@ -45,7 +45,7 @@ import { Auth } from '@angular/fire/auth';
       >
         <mat-form-field appearance="fill" class="w-full mb-4">
           <mat-label class="!text-[var(--color-text-secondary)]"
-            >Title</mat-label
+            >Nazwa zadania</mat-label
           >
           <input
             matInput
@@ -56,7 +56,7 @@ import { Auth } from '@angular/fire/auth';
 
         <mat-form-field appearance="fill" class="w-full mb-4">
           <mat-label class="!text-[var(--color-text-secondary)]"
-            >Description</mat-label
+            >Opis</mat-label
           >
           <textarea
             matInput
@@ -67,14 +67,14 @@ import { Auth } from '@angular/fire/auth';
 
         <mat-form-field appearance="fill" class="w-full mb-4">
           <mat-label class="!text-[var(--color-text-secondary)]"
-            >Priority</mat-label
+            >Priorytet</mat-label
           >
           <mat-select
             formControlName="priority"
             class="!text-[var(--color-text-primary)]"
           >
-            <mat-option *ngFor="let priority of priorities" [value]="priority">
-              {{ priority | titlecase }}
+            <mat-option *ngFor="let p of priorities" [value]="p">
+              {{ priorityLabels[p] }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -87,15 +87,15 @@ import { Auth } from '@angular/fire/auth';
             formControlName="status"
             class="!text-[var(--color-text-primary)]"
           >
-            <mat-option *ngFor="let status of statuses" [value]="status">
-              {{ status | titlecase }}
+            <mat-option *ngFor="let s of statuses" [value]="s">
+              {{ statusLabels[s] }}
             </mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-full mb-4">
           <mat-label class="!text-[var(--color-text-secondary)]"
-            >Due Date</mat-label
+            >Data wykonania</mat-label
           >
           <input
             matInput
@@ -119,7 +119,7 @@ import { Auth } from '@angular/fire/auth';
           (click)="onCancel()"
           class="!text-[var(--color-text-secondary)] hover:!bg-[var(--surface-hover)]"
         >
-          Cancel
+          Anuluj
         </button>
         <button
           mat-raised-button
@@ -127,7 +127,7 @@ import { Auth } from '@angular/fire/auth';
           [disabled]="!taskForm.valid"
           class="!bg-[var(--color-accent)] !text-[var(--color-accent-contrast)] hover:!bg-opacity-90 disabled:!bg-[var(--color-accent-disabled)]"
         >
-          {{ isEditMode ? 'Save Changes' : 'Create Task' }}
+          {{ isEditMode ? 'Zapisz zmiany' : 'Dodaj zadanie' }}
         </button>
       </div>
     </form>
@@ -312,6 +312,17 @@ export class TaskFormComponent implements OnInit {
   priorities: TaskPriority[] = ['low', 'medium', 'high'];
   statuses: TaskStatus[] = ['todo', 'in_progress', 'done'];
   isEditMode = false;
+
+  priorityLabels: Record<TaskPriority, string> = {
+    low: 'Niski',
+    medium: 'Średni',
+    high: 'Wysoki',
+  };
+  statusLabels: Record<TaskStatus, string> = {
+    todo: 'Do zrobienia',
+    in_progress: 'W trakcie',
+    done: 'Zrobione',
+  };
 
   constructor() {
     this.isEditMode = !!this.data?.taskToEdit;

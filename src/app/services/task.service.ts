@@ -91,7 +91,8 @@ export class TaskService {
   ): Observable<Task[]> {
     let q = query(this.tasksCollection);
 
-    if (!isAdmin && userId) {
+    // Always apply user filter if provided (for admin panel filtering or user-specific view)
+    if (userId) {
       q = query(q, where('assignedUsers', 'array-contains', userId));
     }
 
@@ -99,7 +100,14 @@ export class TaskService {
       q = query(q, where('status', '==', statusFilter));
     }
 
-    if (sortBy) {
+    // If sorting by priority, defer to client-side sort (Firestore orders strings lexicographically)
+    const priorityWeights: Record<string, number> = {
+      low: 1,
+      medium: 2,
+      high: 3,
+    };
+    const clientSortPriority = sortBy === 'priority';
+    if (!clientSortPriority && sortBy) {
       q = query(q, orderBy(sortBy, sortOrder));
     }
 
@@ -114,7 +122,7 @@ export class TaskService {
     return collectionData(q, { idField: 'id' }).pipe(
       map((tasks: any[]) => {
         console.log('Fetched tasks:', tasks);
-        return tasks.map((task: any) => ({
+        const converted = tasks.map((task: any) => ({
           ...task,
           dueDate:
             task.dueDate instanceof Timestamp
@@ -129,6 +137,14 @@ export class TaskService {
               ? task.updatedAt.toDate()
               : task.updatedAt,
         }));
+        if (clientSortPriority) {
+          converted.sort((a, b) =>
+            sortOrder === 'asc'
+              ? priorityWeights[a.priority] - priorityWeights[b.priority]
+              : priorityWeights[b.priority] - priorityWeights[a.priority]
+          );
+        }
+        return converted;
       })
     );
   }

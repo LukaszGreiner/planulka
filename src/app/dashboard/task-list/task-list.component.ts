@@ -30,194 +30,119 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
     TaskFilterPipe,
   ],
   template: `
-    <div class="task-list-container">
+    <div
+      class="task-list-container flex-1 flex items-center justify-center h-full"
+    >
       <div class="filters">
-        <mat-form-field appearance="fill">
-          <mat-label>Sort by</mat-label>
+        <mat-form-field
+          appearance="fill"
+          floatLabel="auto"
+          class="themed-form-field"
+        >
+          <mat-icon matPrefix style="color: var(--color-accent)">sort</mat-icon>
+          <mat-label>Sortuj po:</mat-label>
           <mat-select [formControl]="sortBy">
-            <mat-option value="">None</mat-option>
-            <mat-option value="priority">Priority</mat-option>
-            <mat-option value="createdAt">Creation Date</mat-option>
+            <mat-option value="">Brak</mat-option>
+            <mat-option value="priority">Priorytet</mat-option>
+            <mat-option value="createdAt">Data utworzenia</mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Sort Order</mat-label>
+        <mat-form-field
+          appearance="fill"
+          floatLabel="auto"
+          class="themed-form-field"
+        >
+          <mat-icon matPrefix style="color: var(--color-accent)"
+            >swap_vert</mat-icon
+          >
+          <mat-label>Kierunek:</mat-label>
           <mat-select [formControl]="sortOrder">
-            <mat-option value="asc">Ascending</mat-option>
-            <mat-option value="desc">Descending</mat-option>
+            <mat-option value="asc">Rosnąco</mat-option>
+            <mat-option value="desc">Malejąco</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- nowy filtr dueDate -->
+        <mat-form-field
+          appearance="fill"
+          floatLabel="auto"
+          class="themed-form-field"
+        >
+          <mat-icon matPrefix style="color: var(--color-accent)"
+            >event</mat-icon
+          >
+          <mat-label>Data wykonania:</mat-label>
+          <mat-select [formControl]="dateFilter">
+            <mat-option value="none">Brak</mat-option>
+            <mat-option value="today">Dzisiaj</mat-option>
+            <mat-option value="week">Ten tydzień</mat-option>
+            <mat-option value="month">Ten miesiąc</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
 
       <div class="columns-container">
-        <div class="task-column">
-          <h2 class="column-title">To Do</h2>
-          <div class="task-list">
-            <mat-card
-              *ngFor="let task of tasks | taskFilter : 'todo'"
-              class="task-card"
-            >
-              <mat-card-header>
-                <mat-card-title>{{ task.title }}</mat-card-title>
-                <mat-card-subtitle>
-                  Priority: {{ task.priority | titlecase }} | Due:
-                  {{ task.dueDate | date : 'shortDate' }}
-                </mat-card-subtitle>
-              </mat-card-header>
-              <mat-card-content>
-                <p>{{ task.description }}</p>
-              </mat-card-content>
-              <mat-card-actions align="end">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="editTask(task)"
-                  aria-label="Edit task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  [color]="getStatusColor(task)"
-                  (click)="toggleComplete(task)"
-                  [disabled]="!isOwnerOrAdmin(task)"
-                  aria-label="Toggle task status"
-                >
-                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="deleteTask(task)"
-                  aria-label="Delete task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </mat-card-actions>
-            </mat-card>
-            <p
-              *ngIf="(tasks | taskFilter : 'todo').length === 0"
-              class="no-tasks-message"
-            >
-              No tasks to do
-            </p>
+        <ng-container *ngFor="let col of columns">
+          <div class="task-column">
+            <h2 class="column-title">{{ col.title }}</h2>
+            <div class="task-list">
+              <mat-card
+                *ngFor="let task of tasks | taskFilter : col.key"
+                class="task-card"
+              >
+                <mat-card-header>
+                  <mat-card-title>{{ task.title }}</mat-card-title>
+                  <mat-card-subtitle>
+                    Priorytet: {{ priorityMap[task.priority] }}
+                    {{ task.dueDate && '| Do:' }}
+                    {{ task.dueDate | date : 'shortDate' }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <p class="overflow-hidden text-ellipsis">
+                    {{ task.description }}
+                  </p>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="editTask(task)"
+                    aria-label="Edit task"
+                    *ngIf="isOwnerOrAdmin(task)"
+                  >
+                    <mat-icon matPrefix>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    [color]="getStatusColor(task)"
+                    (click)="toggleComplete(task)"
+                    [disabled]="!isOwnerOrAdmin(task)"
+                    aria-label="Toggle task status"
+                  >
+                    <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="deleteTask(task)"
+                    aria-label="Delete task"
+                    *ngIf="isOwnerOrAdmin(task)"
+                  >
+                    <mat-icon color="accent">delete</mat-icon>
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+              <p
+                *ngIf="(tasks | taskFilter : col.key).length === 0"
+                class="no-tasks-message"
+              >
+                {{ col.emptyMessage }}
+              </p>
+            </div>
           </div>
-        </div>
-
-        <div class="task-column">
-          <h2 class="column-title">In Progress</h2>
-          <div class="task-list">
-            <mat-card
-              *ngFor="let task of tasks | taskFilter : 'in_progress'"
-              class="task-card"
-            >
-              <mat-card-header>
-                <mat-card-title>{{ task.title }}</mat-card-title>
-                <mat-card-subtitle>
-                  Priority: {{ task.priority | titlecase }} | Due:
-                  {{ task.dueDate | date : 'shortDate' }}
-                </mat-card-subtitle>
-              </mat-card-header>
-              <mat-card-content>
-                <p>{{ task.description }}</p>
-              </mat-card-content>
-              <mat-card-actions align="end">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="editTask(task)"
-                  aria-label="Edit task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  [color]="getStatusColor(task)"
-                  (click)="toggleComplete(task)"
-                  [disabled]="!isOwnerOrAdmin(task)"
-                  aria-label="Toggle task status"
-                >
-                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="deleteTask(task)"
-                  aria-label="Delete task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </mat-card-actions>
-            </mat-card>
-            <p
-              *ngIf="(tasks | taskFilter : 'in_progress').length === 0"
-              class="no-tasks-message"
-            >
-              No tasks in progress
-            </p>
-          </div>
-        </div>
-
-        <div class="task-column">
-          <h2 class="column-title">Done</h2>
-          <div class="task-list">
-            <mat-card
-              *ngFor="let task of tasks | taskFilter : 'done'"
-              class="task-card"
-            >
-              <mat-card-header>
-                <mat-card-title>{{ task.title }}</mat-card-title>
-                <mat-card-subtitle>
-                  Priority: {{ task.priority | titlecase }} | Due:
-                  {{ task.dueDate | date : 'shortDate' }}
-                </mat-card-subtitle>
-              </mat-card-header>
-              <mat-card-content>
-                <p>{{ task.description }}</p>
-              </mat-card-content>
-              <mat-card-actions align="end">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="editTask(task)"
-                  aria-label="Edit task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  [color]="getStatusColor(task)"
-                  (click)="toggleComplete(task)"
-                  [disabled]="!isOwnerOrAdmin(task)"
-                  aria-label="Toggle task status"
-                >
-                  <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="deleteTask(task)"
-                  aria-label="Delete task"
-                  *ngIf="isOwnerOrAdmin(task)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </mat-card-actions>
-            </mat-card>
-            <p
-              *ngIf="(tasks | taskFilter : 'done').length === 0"
-              class="no-tasks-message"
-            >
-              No completed tasks
-            </p>
-          </div>
-        </div>
+        </ng-container>
       </div>
     </div>
   `,
@@ -225,9 +150,8 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
     `
       .task-list-container {
         display: flex;
+
         flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
         background-color: var(
           --surface-ground
         ); /* Ensure container bg is themed */
@@ -265,9 +189,11 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
       }
 
       .columns-container {
+        /* Use fixed-width columns to ensure consistent sizing */
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
+        grid-template-columns: repeat(3, 300px);
+        justify-content: center; /* Center the fixed-size grid */
+        gap: 3rem;
         min-height: calc(100vh - 200px);
       }
 
@@ -327,12 +253,12 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
       /* Status toggle icons based on Angular Material theme palette on the button */
       /* For 'To Do' status (button has color='warn') */
       mat-card-actions button.mat-warn .mat-icon {
-        color: var(--color-text-secondary) !important;
+        color: var(--color-accent) !important;
       }
 
       /* For 'In Progress' status (button has color='primary') */
       mat-card-actions button.mat-primary .mat-icon {
-        color: var(--color-info) !important;
+        color: var(--color-accent) !important;
       }
 
       /* For 'Done' status (button has color='accent') */
@@ -436,8 +362,29 @@ export class TaskListComponent implements OnInit {
   userRole: 'admin' | 'user' | null = null;
   private roleLoaded = false;
   statusFilter = new FormControl('');
-  sortBy = new FormControl('');
-  sortOrder = new FormControl('asc');
+  sortBy = new FormControl('priority');
+  sortOrder = new FormControl('desc');
+  dateFilter = new FormControl('none');
+  priorityMap: Record<string, string> = {
+    low: 'niski',
+    medium: 'średni',
+    high: 'wysoki',
+  };
+
+  /** Definicja kolumn z zadaniami */
+  columns: { key: TaskStatus; title: string; emptyMessage: string }[] = [
+    {
+      key: 'todo',
+      title: 'Do zrobienia',
+      emptyMessage: 'Brak zadań do zrobienia 😎',
+    },
+    {
+      key: 'in_progress',
+      title: 'W trakcie',
+      emptyMessage: 'Brak zadań w trakcie',
+    },
+    { key: 'done', title: 'Ukończone', emptyMessage: 'Brak ukończonych zadań' },
+  ];
 
   ngOnInit(): void {
     this.loadUserRole().then(() => {
@@ -482,7 +429,7 @@ export class TaskListComponent implements OnInit {
         )
         .subscribe((tasks) => {
           console.log('Tasks fetched:', tasks);
-          this.tasks = tasks;
+          this.tasks = this.applyDateFilter(tasks);
         });
     }
   }
@@ -491,6 +438,31 @@ export class TaskListComponent implements OnInit {
     this.statusFilter.valueChanges.subscribe(() => this.loadTasks());
     this.sortBy.valueChanges.subscribe(() => this.loadTasks());
     this.sortOrder.valueChanges.subscribe(() => this.loadTasks());
+    this.dateFilter.valueChanges.subscribe(() => this.loadTasks());
+  }
+
+  /** Filtruje zadania wg dueDate na podstawie wyboru dateFilter */
+  private applyDateFilter(tasks: Task[]): Task[] {
+    const mode = this.dateFilter.value;
+    const now = new Date();
+    return tasks.filter((t) => {
+      const d = t.dueDate ? new Date(t.dueDate) : null;
+      if (mode === 'none') return true;
+      if (!d) return false;
+      if (mode === 'today') return d.toDateString() === now.toDateString();
+      if (mode === 'week') {
+        const weekAgo = new Date(now);
+        weekAgo.setDate(now.getDate() - 7);
+        return d >= weekAgo && d <= now;
+      }
+      if (mode === 'month') {
+        return (
+          d.getFullYear() === now.getFullYear() &&
+          d.getMonth() === now.getMonth()
+        );
+      }
+      return true;
+    });
   }
 
   isOwnerOrAdmin(task: Task): boolean {
@@ -540,6 +512,10 @@ export class TaskListComponent implements OnInit {
 
   deleteTask(task: Task): void {
     if (!task.id || !this.isOwnerOrAdmin(task)) return;
+    const confirmation = confirm(
+      `Czy na pewno chcesz usunąć zadanie "${task.title}"?\nTa akcja jest nieodwracalna.`
+    );
+    if (!confirmation) return;
     this.taskService.deleteTask(task.id).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t.id !== task.id);
     });

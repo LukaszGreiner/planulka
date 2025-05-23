@@ -53,11 +53,20 @@ export class AdminPanelComponent implements OnInit {
   userRole: 'admin' | 'user' | null = null;
   tasks: Task[] = [];
   users$!: Observable<UserProfile[]>;
-  taskColumns: string[] = ['title', 'priority', 'status', 'dueDate', 'actions'];
+  userMap: Record<string, string> = {};
+  taskColumns: string[] = [
+    'user',
+    'title',
+    'priority',
+    'status',
+    'dueDate',
+    'actions',
+  ];
   userColumns: string[] = ['email', 'role', 'actions'];
   statusFilter = new FormControl('');
   sortBy = new FormControl('');
   sortOrder = new FormControl('asc');
+  userFilter = new FormControl('');
 
   ngOnInit(): void {
     this.authService.getUserRole().subscribe((role) => {
@@ -73,17 +82,42 @@ export class AdminPanelComponent implements OnInit {
   }
 
   loadTasks(): void {
-    this.taskService
-      .getFilteredAndSortedTasks(
-        null, // Admins see all tasks, so no userId filter
-        this.statusFilter.value as 'todo' | 'in_progress' | 'done' | null,
-        this.sortBy.value as 'priority' | 'createdAt' | null,
-        this.sortOrder.value as 'asc' | 'desc',
-        true // isAdmin = true
-      )
-      .subscribe((tasks) => {
-        this.tasks = tasks;
-      });
+    const selectedUserId = this.userFilter.value || null;
+    const status = this.statusFilter.value as
+      | 'todo'
+      | 'in_progress'
+      | 'done'
+      | null;
+    const sortByField = this.sortBy.value as 'priority' | 'createdAt' | null;
+    const sortDir = this.sortOrder.value as 'asc' | 'desc';
+    this.taskService.getAllTasks().subscribe((tasks) => {
+      let filtered = tasks;
+      if (selectedUserId) {
+        filtered = filtered.filter((t) =>
+          t.assignedUsers?.includes(selectedUserId)
+        );
+      }
+      if (status) {
+        filtered = filtered.filter((t) => t.status === status);
+      }
+      if (sortByField) {
+        const priorityWeights: Record<string, number> = {
+          low: 1,
+          medium: 2,
+          high: 3,
+        };
+        filtered.sort((a, b) => {
+          let cmp = 0;
+          if (sortByField === 'priority') {
+            cmp = priorityWeights[a.priority] - priorityWeights[b.priority];
+          } else if (sortByField === 'createdAt') {
+            cmp = (a.createdAt.getTime() || 0) - (b.createdAt.getTime() || 0);
+          }
+          return sortDir === 'asc' ? cmp : -cmp;
+        });
+      }
+      this.tasks = filtered;
+    });
   }
 
   loadUsers(): void {
@@ -104,12 +138,18 @@ export class AdminPanelComponent implements OnInit {
           })) as UserProfile[]
       )
     );
+    // Populate map of user IDs to emails
+    this.users$.subscribe((users) => {
+      this.userMap = {};
+      users.forEach((u) => (this.userMap[u.id] = u.email));
+    });
   }
 
   subscribeToFilters(): void {
     this.statusFilter.valueChanges.subscribe(() => this.loadTasks());
     this.sortBy.valueChanges.subscribe(() => this.loadTasks());
     this.sortOrder.valueChanges.subscribe(() => this.loadTasks());
+    this.userFilter.valueChanges.subscribe(() => this.loadTasks());
   }
 
   async editTask(task: Task): Promise<void> {
