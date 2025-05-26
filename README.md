@@ -1,82 +1,70 @@
-# Planulka
+# Planulka – Aplikacja do Zarządzania Zadaniami
 
-This project is a task management application built with Angular 19 and Firebase. It supports user authentication, task management, and role-based access control.
+## Instrukcja Instalacji
 
-## Features
+1. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+2. Pomiń konfigurację Firebase
+3. Zbuduj aplikację:
+   ```bash
+   ng build
+   ```
+4. Uruchom serwer developerski:
+   ```bash
+   ng serve
+   ```
+5. Otwórz w przeglądarce:
+   ```
+   http://localhost:4200/
+   ```
+6. Zaloguj się na konto testowe (patrz niżej) lub zarejestruj nowe.
 
-- **Frontend**: Angular 19, TypeScript, Angular Material, Tailwind CSS 4.0
-- **Backend**: Firebase (Authentication, Firestore, Storage)
-- **Authentication**: JWT-based authentication with Firebase Auth
-- **Routing**: Angular Router with role-based guards
-- **Progressive Web App (PWA)**: Offline support and installable on devices
-- **Responsive Design**: Mobile-first approach with a sweet and friendly UI
+## Opis Projektu
 
-## Development server
+Planulka to PWA do zarządzania zadaniami z autoryzacją opartą na Firebase.  
+Umożliwia:
 
-To start a local development server, run:
+- tworzenie, edycję i usuwanie zadań,
+- zarządzanie priorytetami, statusami, terminami, tagami i załącznikami,
+- panel administratora do zarządzania użytkownikami i zadaniami.
 
-```bash
-ng serve
-```
+Styl: słodki, przyjazny, responsywny (Mobile First).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Technologie
 
-## Building
+- Angular 19 & TypeScript
+- Angular Material & Tailwind CSS 4.0
+- Firebase (Auth, Firestore)
+- Angular Router & Guards
+- PWA
 
-To build the project, run:
+## Funkcjonalności
 
-```bash
-ng build
-```
+- Rejestracja i logowanie (email + hasło)
+- Role: **admin** i **user**
+- Panel użytkownika i administratora
+- Zarządzanie zadaniami (CRUD)
+- Walidacja formularzy (Reactive Forms)
+- Obsługa błędów i toasty/alerty
+- Autoryzacja JWT via Firebase
+- Przechowywanie załączników w Firebase Storage
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Role użytkowników
 
-## Firebase Setup
+- **Administrator** – pełny dostęp do wszystkich użytkowników i zadań
+- **Użytkownik** – zarządza własnymi zadaniami
 
-Ensure you have Firebase configured in your project. Update the `environment.ts` and `environment.prod.ts` files with your Firebase project credentials.
+## Konta testowe
 
-## Running unit tests
+- **Admin**: `admin@admin.pl` / `admin@admin.pl`
+- **User**: `user@user.pl` / `user@user.pl`
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Możesz też utworzyć nowe konto przez formularz rejestracji.
 
-```bash
-ng test
-```
+## Opis Działania
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Test Accounts
-
-- **Admin Account**:
-  - Email: `admin@example.com`
-  - Password: `admin123`
-- **User Account**:
-  - Email: `user@gmail.com`
-  - Password: `user123`
-
-## Style Guide
-
-The application uses a sweet, innocent, and friendly design with the following color palette:
-
-- **Celadon**: `hsla(137, 38%, 77%, 1)`
-- **Peach Yellow**: `hsla(37, 90%, 84%, 1)`
-- **Tangerine**: `hsla(28, 82%, 54%, 1)`
-- **Hunter Green**: `hsla(133, 28%, 32%, 1)`
-- **Fawn**: `hsla(28, 85%, 71%, 1)`
-
-## Future Enhancements
-
-- Integration with Google Calendar
-- CI/CD pipeline setup
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Użytkownik rejestruje się lub loguje.
+2. Po zalogowaniu widzi panel z listą zadań, może je filtrować, tworzyć, edytować i usuwać.
+3. Administrator dodatkowo zarządza wszystkimi użytkownikami i zadaniami.
