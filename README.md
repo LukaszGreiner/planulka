@@ -1,5 +1,10 @@
 # Planulka – Aplikacja do Zarządzania Zadaniami
 
+## Aplikacja dostępna lokalnie lub online pod adresem:
+![icon-128](https://github.com/user-attachments/assets/dee25feb-cb52-47d0-b644-05f7db84a7f0)
+
+[planulka.vercel.app/](https://planulka.vercel.app/)
+
 ## Instrukcja Instalacji
 
 1. Zainstaluj zależności:
