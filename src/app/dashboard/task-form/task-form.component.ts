@@ -4,6 +4,7 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
+  FormArray,
   Validators,
 } from '@angular/forms';
 import {
@@ -17,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 import { TaskService } from '../../services/task.service';
 import { Task, TaskPriority, TaskStatus } from '../../models/task.model';
 import { Auth } from '@angular/fire/auth';
@@ -34,6 +36,7 @@ import { Auth } from '@angular/fire/auth';
     MatNativeDateModule,
     MatSelectModule,
     MatDialogModule,
+    MatIconModule,
   ],
   template: `
     <h2 mat-dialog-title class="!text-[var(--color-text-primary)]">
@@ -41,7 +44,7 @@ import { Auth } from '@angular/fire/auth';
     </h2>
     <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content
-        class="!bg-[var(--surface-dialog)] !text-[var(--color-text-primary)]"
+        class="!bg-[var(--surface-dialog)] !text-[var(--color-text-primary)] overflow-scroll"
       >
         <mat-form-field appearance="fill" class="w-full mb-4">
           <mat-label class="!text-[var(--color-text-secondary)]"
@@ -110,6 +113,48 @@ import { Auth } from '@angular/fire/auth';
           ></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
+
+        <div formArrayName="attachments" class="mb-4">
+          <h3 class="mb-2 text-[var(--color-text-secondary)]">Załączniki</h3>
+          <div
+            *ngFor="
+              let attachment of attachmentsFormArray.controls;
+              let i = index
+            "
+            class="flex gap-2 mb-2"
+          >
+            <mat-form-field appearance="fill" class="flex-grow">
+              <mat-label class="!text-[var(--color-text-secondary)]"
+                >Link do załącznika</mat-label
+              >
+              <input
+                matInput
+                [formControlName]="i"
+                placeholder="https://example.com"
+              />
+              <mat-error *ngIf="attachment.errors?.['pattern']">
+                Nieprawidłowy format URL. Link musi zaczynać się od http:// lub
+                https://
+              </mat-error>
+            </mat-form-field>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              (click)="removeAttachment(i)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <button
+            type="button"
+            mat-stroked-button
+            color="primary"
+            (click)="addAttachment()"
+          >
+            <mat-icon>add</mat-icon> Dodaj załącznik
+          </button>
+        </div>
       </mat-dialog-content>
 
       <div mat-dialog-actions class="!bg-[var(--surface-dialog)]">
@@ -335,11 +380,35 @@ export class TaskFormComponent implements OnInit {
       status: [task?.status || 'todo', Validators.required],
       dueDate: [task?.dueDate ? new Date(task.dueDate) : null],
       tags: [task?.tags?.join(', ') || ''],
+      attachments: this.fb.array([]),
     });
+
+    // Initialize attachments with URL validation
+    if (task?.attachments?.length) {
+      task.attachments.forEach((url) => {
+        this.attachmentsFormArray.push(
+          this.fb.control(url, [Validators.pattern('https?://.*')])
+        );
+      });
+    }
   }
 
   ngOnInit(): void {
     // Initialization logic if needed
+  }
+
+  get attachmentsFormArray(): FormArray {
+    return this.taskForm.get('attachments') as FormArray;
+  }
+
+  addAttachment(): void {
+    this.attachmentsFormArray.push(
+      this.fb.control('', [Validators.pattern('https?://.*')])
+    );
+  }
+
+  removeAttachment(index: number): void {
+    this.attachmentsFormArray.removeAt(index);
   }
 
   onSubmit(): void {
@@ -354,11 +423,17 @@ export class TaskFormComponent implements OnInit {
       const tags = formValue.tags
         ? formValue.tags.split(',').map((tag: string) => tag.trim())
         : [];
+      const attachments = formValue.attachments
+        ? formValue.attachments
+            .filter((link: string) => link.trim())
+            .map((link: string) => link.trim())
+        : [];
 
       if (this.isEditMode && this.data?.taskToEdit?.id) {
         const updatedTask: Partial<Task> = {
           ...formValue,
           tags,
+          attachments,
           updatedAt: new Date(),
         };
         this.taskService
@@ -374,6 +449,7 @@ export class TaskFormComponent implements OnInit {
         const newTask: Task = {
           ...formValue,
           tags,
+          attachments,
           createdAt: new Date(),
           updatedAt: new Date(),
           status: 'todo',

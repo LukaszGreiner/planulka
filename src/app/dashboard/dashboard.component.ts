@@ -18,7 +18,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatNativeDateModule,
   ],
   template: `<div
-    class="bg-[var(--surface-ground)] min-h-full flex items-center justify-center pt-2"
+    class="bg-[var(--surface-ground)] min-h-full flex items-center justify-center pt-2 "
   >
     <button
       mat-fab

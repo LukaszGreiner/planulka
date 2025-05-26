@@ -33,7 +33,7 @@ import { filter } from 'rxjs/operators';
           (click)="logout()"
           class="app-header-button logout-button cursor-pointer"
         >
-          Logout
+          Wyloguj się
         </button>
       </nav>
     </header>

@@ -7,9 +7,9 @@ export interface Task {
   description: string;
   priority: TaskPriority;
   status: TaskStatus;
-  dueDate: Date; // Will be stored as Timestamp in Firestore
-  createdAt: Date; // Will be stored as Timestamp in Firestore
-  updatedAt: Date; // Will be stored as Timestamp in Firestore
+  dueDate: Date; // Timestamp in Firestore
+  createdAt: Date; // Timestamp in Firestore
+  updatedAt: Date; // Timestamp in Firestore
   tags?: string[];
   assignedUsers: string[]; // Array of user IDs
   attachments?: string[];

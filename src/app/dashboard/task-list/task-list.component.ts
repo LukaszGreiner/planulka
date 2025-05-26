@@ -13,6 +13,7 @@ import { Auth } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-task-list',
@@ -28,10 +29,11 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
     MatFormFieldModule,
     ReactiveFormsModule,
     TaskFilterPipe,
+    MatTooltipModule,
   ],
   template: `
     <div
-      class="task-list-container flex-1 flex items-center justify-center h-full my-12"
+      class="task-list-container flex-1 flex items-center min-h-screen my-24 overflow-hidden"
     >
       <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
         <mat-form-field
@@ -63,7 +65,6 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
           </mat-select>
         </mat-form-field>
 
-        <!-- nowy filtr dueDate -->
         <mat-form-field
           appearance="fill"
           floatLabel="auto"
@@ -82,9 +83,9 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         </mat-form-field>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 px-4 ">
         <div *ngFor="let col of columns" class="w-full">
-          <div class="task-column">
+          <div class="task-column max-w-md">
             <h2 class="column-title">{{ col.title }}</h2>
             <div class="task-list">
               <mat-card
@@ -100,16 +101,100 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
                   </mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
-                  <p class="overflow-hidden text-ellipsis">
+                  <p class="overflow-hidden text-ellipsis mb-2">
                     {{ task.description }}
                   </p>
+
+                  <div
+                    *ngIf="task.attachments && task.attachments.length"
+                    class="b-2"
+                  >
+                    <div class="attachment-container">
+                      <div
+                        *ngIf="task.attachments.length === 1"
+                        class="flex items-center gap-2"
+                      >
+                        <mat-icon
+                          class="text-[var(--color-text-secondary)] text-base"
+                          >attach_file</mat-icon
+                        >
+                        <a
+                          [href]="task.attachments[0]"
+                          target="_blank"
+                          class="text-[var(--color-accent)] hover:underline truncate"
+                          [attr.aria-label]="
+                            'Otwórz ' +
+                            getFullAttachmentName(task.attachments[0])
+                          "
+                        >
+                          {{ getAttachmentName(task.attachments[0]) }}
+                        </a>
+                      </div>
+                      <div
+                        *ngIf="task.attachments.length > 1"
+                        class="flex items-center gap-2"
+                      >
+                        <mat-icon
+                          class="text-[var(--color-text-secondary)] text-base"
+                          >attach_file</mat-icon
+                        >
+                        <span
+                          class="text-sm text-[var(--color-text-secondary)]"
+                        >
+                          {{ getAttachmentName(task.attachments[0]) }}
+                          <span
+                            [matTooltip]="
+                              task.attachments.length + ' załącznik(ów)'
+                            "
+                          >
+                            +{{ task.attachments.length - 1 }}
+                          </span>
+                        </span>
+                        <button
+                          mat-icon-button
+                          color="primary"
+                          (click)="toggleAttachments(task)"
+                          aria-label="Rozwiń załączniki"
+                          class="ml-auto rotate-icon"
+                          [ngClass]="{ rotated: isAttachmentsExpanded(task) }"
+                        >
+                          <mat-icon>chevron_right</mat-icon>
+                        </button>
+                      </div>
+                      <div
+                        *ngIf="
+                          isAttachmentsExpanded(task) &&
+                          task.attachments.length > 1
+                        "
+                        class="attachment-list"
+                      >
+                        <div class="pl-4 pt-2">
+                          <div
+                            *ngFor="let attachment of task.attachments"
+                            class="flex items-center gap-2 mb-1"
+                          >
+                            <a
+                              [href]="attachment"
+                              target="_blank"
+                              class="text-[var(--color-accent)] hover:underline truncate"
+                              [attr.aria-label]="
+                                'Otwórz ' + getFullAttachmentName(attachment)
+                              "
+                            >
+                              {{ getAttachmentName(attachment) }}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </mat-card-content>
                 <mat-card-actions align="end">
                   <button
                     mat-icon-button
                     color="primary"
                     (click)="editTask(task)"
-                    aria-label="Edit task"
+                    aria-label="Edytuj zadanie"
                     *ngIf="isOwnerOrAdmin(task)"
                   >
                     <mat-icon matPrefix>edit</mat-icon>
@@ -119,7 +204,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
                     [color]="getStatusColor(task)"
                     (click)="toggleComplete(task)"
                     [disabled]="!isOwnerOrAdmin(task)"
-                    aria-label="Toggle task status"
+                    [attr.aria-label]="'Zmień status zadania ' + task.title"
                   >
                     <mat-icon>{{ getStatusIcon(task) }}</mat-icon>
                   </button>
@@ -127,7 +212,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
                     mat-icon-button
                     color="warn"
                     (click)="deleteTask(task)"
-                    aria-label="Delete task"
+                    aria-label="Usuń zadanie"
                     *ngIf="isOwnerOrAdmin(task)"
                   >
                     <mat-icon color="accent">delete</mat-icon>
@@ -150,22 +235,18 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
     `
       .task-list-container {
         display: flex;
-
         flex-direction: column;
-        background-color: var(
-          --surface-ground
-        ); /* Ensure container bg is themed */
-        color: var(--color-text-primary); /* Ensure text color is themed */
+        background-color: var(--surface-ground);
+        color: var(--color-text-primary);
       }
 
       .filters {
         display: flex;
         gap: 1rem;
         margin-bottom: 1rem;
-        justify-content: center; /* Center the filters */
+        justify-content: center;
       }
 
-      /* Styling for mat-form-field in filters */
       .filters mat-form-field .mat-mdc-text-field-wrapper {
         background-color: var(--surface-input) !important;
       }
@@ -182,29 +263,18 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         fill: var(--color-text-secondary) !important;
       }
       .filters mat-form-field .mat-mdc-form-field-focus-overlay {
-        background-color: transparent !important; /* Remove default focus overlay if not desired */
+        background-color: transparent !important;
       }
       .filters mat-form-field .mdc-line-ripple::after {
         border-bottom-color: var(--color-accent) !important;
-      }
-
-      .columns-container {
-        /* Use fixed-width columns to ensure consistent sizing */
-        display: grid;
-        grid-template-columns: repeat(3, 300px);
-        justify-content: center; /* Center the fixed-size grid */
-        gap: 3rem;
-        min-height: calc(100vh - 200px);
       }
 
       .task-column {
         background-color: var(--surface-card);
         border-radius: 8px;
         padding: 1rem;
-        overflow-y: auto; /* Enable vertical scrolling */
-        max-height: calc(
-          100vh - 250px
-        ); /* Prevent overflow beyond screen height */
+        overflow-y: auto;
+        max-height: calc(100vh - 250px);
       }
 
       .column-title {
@@ -227,47 +297,36 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
       .task-card {
         margin-bottom: 1rem;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease-in-out;
-        background-color: var(--surface-dialog); /* Changed from white */
+        background-color: var(--surface-dialog);
         color: var(--color-text-primary);
       }
 
-      .task-card:hover {
-        box-shadow: none; /* Removed hover effect from task card */
-      }
-
       mat-card-actions button mat-icon {
-        transition: color 0.2s ease-in-out; /* Smooth color transition for icons */
+        transition: color 0.2s ease-in-out;
       }
 
-      /* Edit button icon */
-      mat-card-actions button[aria-label='Edit task'] mat-icon {
+      mat-card-actions button[aria-label='Edytuj zadanie'] mat-icon {
         color: var(--color-accent) !important;
       }
 
-      /* Delete button icon */
-      mat-card-actions button[aria-label='Delete task'] mat-icon {
+      mat-card-actions button[aria-label='Usuń zadanie'] mat-icon {
         color: var(--color-error) !important;
       }
 
-      /* Status toggle icons based on Angular Material theme palette on the button */
-      /* For 'To Do' status (button has color='warn') */
       mat-card-actions button.mat-warn .mat-icon {
         color: var(--color-accent) !important;
       }
 
-      /* For 'In Progress' status (button has color='primary') */
       mat-card-actions button.mat-primary .mat-icon {
         color: var(--color-accent) !important;
       }
 
-      /* For 'Done' status (button has color='accent') */
       mat-card-actions button.mat-accent .mat-icon {
         color: var(--color-accent) !important;
       }
 
       mat-card-actions button:hover {
-        transform: scale(1.1); /* Added hover effect for task buttons */
+        transform: scale(1.1);
       }
 
       mat-card-header {
@@ -282,7 +341,7 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
 
       mat-card-subtitle {
         font-size: 0.875rem;
-        color: var(--color-text-secondary); /* Changed from #666 */
+        color: var(--color-text-secondary);
       }
 
       mat-card-content p {
@@ -292,17 +351,16 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
 
       mat-card-actions {
         padding-top: 0.5rem;
-        border-top: 1px solid var(--surface-border); /* Changed from #eee */
+        border-top: 1px solid var(--surface-border);
       }
 
       .no-tasks-message {
         text-align: center;
         padding: 2rem;
         font-style: italic;
-        color: var(--color-text-secondary); /* Changed from #888 */
+        color: var(--color-text-secondary);
       }
 
-      /* Specific styles for mat-select dropdown panel and options */
       ::ng-deep .mat-mdc-select-panel {
         background-color: var(--surface-dialog) !important;
       }
@@ -319,34 +377,51 @@ import { TaskFilterPipe } from '../../pipes/task-filter.pipe';
         background-color: var(--surface-hover) !important;
       }
       ::ng-deep
-        .mat-mdc-option.mat-mdc-option-active
-        .mdc-list-item__primary-text,
-      ::ng-deep
-        .mat-mdc-option:focus:not(.mat-mdc-option-selected)
-        .mdc-list-item__primary-text,
-      ::ng-deep
-        .mat-mdc-option:hover:not(.mat-mdc-option-selected)
-        .mdc-list-item__primary-text {
-        color: var(--color-text-primary) !important;
-      }
-      /* Style for the checkmark of a selected mat-option to be orange */
-      ::ng-deep
-        .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
-        .mat-pseudo-checkbox {
-        background: transparent !important; /* Ensure no background on the box itself */
-        border-color: transparent !important; /* Ensure no border on the box itself */
-      }
-      ::ng-deep
         .mat-mdc-option.mat-mdc-option-selected:not(.mat-mdc-option-multiple)
         .mat-pseudo-checkbox::after {
-        /* This pseudo-element is the checkmark path */
-        color: var(
-          --color-accent
-        ) !important; /* Make the checkmark icon orange */
+        color: var(--color-accent) !important;
+      }
+
+      .attachment-section {
+        border-top: 1px solid var(--surface-border);
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .attachment-container {
+        background-color: var(--surface-hover);
+        border-radius: 4px;
+        padding: 0.5rem;
+      }
+
+      .attachment-list {
+        background-color: var(--surface-hover);
+        border-radius: 4px;
+        padding: 0.5rem;
+      }
+
+      .rotate-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .rotate-icon.rotated {
+        transform: rotate(90deg);
+      }
+
+      a[target='_blank'] {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        max-width: 100%;
+      }
+
+      a[target='_blank']:hover {
+        text-decoration: underline;
+        color: var(--color-accent-hover);
       }
 
       @media (max-width: 1024px) {
-        .columns-container {
+        .task-list-container > div {
           grid-template-columns: 1fr;
         }
       }
@@ -359,6 +434,7 @@ export class TaskListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(Auth);
   tasks: Task[] = [];
+  private expandedAttachments = new Map<string, boolean>();
   userRole: 'admin' | 'user' | null = null;
   private roleLoaded = false;
   statusFilter = new FormControl('');
@@ -371,7 +447,6 @@ export class TaskListComponent implements OnInit {
     high: 'wysoki',
   };
 
-  /** Definicja kolumn z zadaniami */
   columns: { key: TaskStatus; title: string; emptyMessage: string }[] = [
     {
       key: 'todo',
@@ -399,10 +474,8 @@ export class TaskListComponent implements OnInit {
         if (role === 'admin' || role === 'user' || role === null) {
           this.userRole = role;
           this.roleLoaded = true;
-          console.log('User role loaded:', this.userRole);
           resolve();
         } else {
-          console.error(`Invalid user role: ${role}`);
           this.roleLoaded = true;
           resolve();
         }
@@ -411,24 +484,19 @@ export class TaskListComponent implements OnInit {
   }
 
   loadTasks(): void {
-    if (!this.roleLoaded) {
-      console.log('Waiting for role to load...');
-      return;
-    }
+    if (!this.roleLoaded) return;
     const currentUser = this.auth.currentUser;
     if (currentUser) {
-      console.log('Loading tasks for role:', this.userRole);
-      const isAdmin = this.userRole === 'admin';
+      const userId = currentUser.uid;
       this.taskService
         .getFilteredAndSortedTasks(
-          isAdmin ? null : currentUser.uid,
+          userId,
           this.statusFilter.value as 'todo' | 'in_progress' | 'done' | null,
           this.sortBy.value as 'priority' | 'createdAt' | null,
           this.sortOrder.value as 'asc' | 'desc',
-          isAdmin
+          false
         )
         .subscribe((tasks) => {
-          console.log('Tasks fetched:', tasks);
           this.tasks = this.applyDateFilter(tasks);
         });
     }
@@ -441,7 +509,6 @@ export class TaskListComponent implements OnInit {
     this.dateFilter.valueChanges.subscribe(() => this.loadTasks());
   }
 
-  /** Filtruje zadania wg dueDate na podstawie wyboru dateFilter */
   private applyDateFilter(tasks: Task[]): Task[] {
     const mode = this.dateFilter.value;
     const now = new Date();
@@ -484,9 +551,7 @@ export class TaskListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadTasks();
-      }
+      if (result) this.loadTasks();
     });
   }
 
@@ -522,21 +587,36 @@ export class TaskListComponent implements OnInit {
   }
 
   getStatusColor(task: Task): string {
-    if (task.status === 'done') {
-      return 'accent';
-    } else if (task.status === 'in_progress') {
-      return 'primary';
-    } else {
-      return 'warn';
-    }
+    if (task.status === 'done') return 'accent';
+    if (task.status === 'in_progress') return 'primary';
+    return 'warn';
   }
+
   getStatusIcon(task: Task): string {
-    if (task.status === 'done') {
-      return 'task_alt';
-    } else if (task.status === 'in_progress') {
-      return 'pending_actions';
-    } else {
-      return 'radio_button_unchecked';
-    }
+    if (task.status === 'done') return 'task_alt';
+    if (task.status === 'in_progress') return 'pending_actions';
+    return 'radio_button_unchecked';
+  }
+
+  toggleAttachments(task: Task): void {
+    if (!task.id) return;
+    this.expandedAttachments.set(task.id, !this.isAttachmentsExpanded(task));
+  }
+
+  isAttachmentsExpanded(task: Task): boolean {
+    return task.id ? this.expandedAttachments.get(task.id) || false : false;
+  }
+
+  getAttachmentName(url: string): string {
+    const fileName = decodeURIComponent(url.split('/').pop() || url);
+    return fileName.length > 30 ? fileName.substring(0, 27) + '...' : fileName;
+  }
+
+  getFullAttachmentName(url: string): string {
+    return decodeURIComponent(url.split('/').pop() || url);
+  }
+
+  getAttachmentSize(url: string): string | null {
+    return null;
   }
 }
